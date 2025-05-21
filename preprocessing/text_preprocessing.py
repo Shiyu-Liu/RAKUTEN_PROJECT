@@ -7,6 +7,7 @@ import numpy as np
 from langdetect import detect
 import html
 import tiktoken
+from difflib import SequenceMatcher
 
 XTrainFile = "X_train.csv"
 YTrainFile = "Y_train.csv"
@@ -234,6 +235,69 @@ class TextPreProcessing(object):
                     print("Don't split the data as the split number is wrong ({})".format(split))
             filtered_data.to_csv(os.path.join(self.save_path, SaveDataFilename+'_step3_filtered.csv'))
 
+    def parse_translation(self, X: pd.DataFrame):
+        X['title'] = ""
+        X['translation'] = ""
+        rows = X.shape[0]
+        i = 1
+        for idx, text in zip(X.index, X['translated_text']):
+            print("Processing row {}/{}".format(i, rows))
+            print(f'Original text: {text}')
+            i += 1
+            text = re.sub(r'\*+|\-', '', text)
+            X.loc[idx, 'translated_text'] = text
+            match_title = re.search(r'Title:\s*(.*)', text)
+            if match_title:
+                title = match_title.group(1)
+                X.loc[idx, 'title'] = title
+                print("Extracted Title:", title)
+            else:
+                X.loc[idx, 'title'] = text
+                print("Put default text as title:", text)
+
+            match_trans = re.search(r'Translation:\s*(.*)', text)
+            if match_trans:
+                translation = match_trans.group(1)
+                X.loc[idx, 'translation'] = translation
+                print("Extracted translation:", translation)
+
+            if match_trans and match_title:
+                if abs(len(re.findall(r'\b\w+\b', title))-len(re.findall(r'\b\w+\b', translation)))<3:
+                    similarity = SequenceMatcher(None, title, translation).ratio()
+                    if similarity > 0.15 and similarity < 0.85:
+                        X.loc[idx, 'title'] = translation
+                        print("Use translation {} for text {}".format(translation, title))
+        return X
+
+    def preprocess_step4(self, csv=None, save_csv=False, split: int=0):
+        if csv is None and self.text_data is None:
+            print("Performing the preprocessing steps first or load from a file.")
+            return
+
+        if csv is not None:
+            try:
+                self.text_data = pd.read_csv(os.path.join(self.save_path, csv), index_col=0)
+            except FileNotFoundError as e:
+                print("Please check the file provided, error message:{}".format(e))
+                return
+
+        # check if the loaded data contains preprocessed and translated description
+        if not 'translated_text' in self.text_data.columns:
+            print("Please provide the data that has been preprocessed and translated.")
+            return
+
+        self.text_data = self.parse_translation(self.text_data)
+
+        self.text_data.rename({'description':'raw_text',
+                               'title': 'text',
+                               'translated_text':'raw_translation',
+                               'prdtypecode': 'target'}, axis=1, inplace=True)
+
+        self.text_data = self.text_data[['raw_text', 'raw_translation', 'text', 'target']]
+
+        if save_csv:
+            self.text_data.to_csv(os.path.join(self.save_path, SaveDataFilename+'_final.csv'))
+
     def save_csv(self):
         self.text_data.to_csv(os.path.join(self.save_path, SaveDataFilename+'.csv'))
 
@@ -269,7 +333,7 @@ def main():
     csv = ""
     if len(sys.argv) > 2:
         step = int(sys.argv[2])
-        if step not in {1,2,3}:
+        if step not in {1,2,3,4}:
             print("Unable to parse step input: {}".format(step))
             step = 0
         else:
@@ -294,6 +358,8 @@ def main():
             t_prep.preprocess_step2(csv, True)
         case 3:
             t_prep.preprocess_step3(csv, True)
+        case 4:
+            t_prep.preprocess_step4(csv, True)
 
 if __name__=="__main__":
     main()
