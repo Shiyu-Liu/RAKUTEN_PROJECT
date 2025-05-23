@@ -290,16 +290,13 @@ class TextPreProcessing(object):
 
         self.text_data.rename({'description':'raw_text',
                                'title': 'text',
-                               'translated_text':'raw_translation',
-                               'prdtypecode': 'target'}, axis=1, inplace=True)
+                               'translated_text':'raw_translation'},
+                               axis=1, inplace=True)
 
-        self.text_data = self.text_data[['raw_text', 'raw_translation', 'text', 'target']]
+        self.text_data = self.text_data[['raw_text', 'raw_translation', 'text', 'prdtypecode']]
 
         if save_csv:
-            self.text_data.to_csv(os.path.join(self.save_path, SaveDataFilename+'_final.csv'))
-
-    def save_csv(self):
-        self.text_data.to_csv(os.path.join(self.save_path, SaveDataFilename+'.csv'))
+            self.text_data.to_csv(os.path.join(self.data_path, SaveDataFilename+'_final.csv'), sep=';')
 
     def print_info(self):
         if self.data_path is None:
@@ -351,7 +348,6 @@ def main():
             t_prep.preprocess_step1()
             t_prep.preprocess_step2()
             t_prep.preprocess_step3()
-            t_prep.save_csv()
         case 1:
             t_prep.preprocess_step1(True)
         case 2:
