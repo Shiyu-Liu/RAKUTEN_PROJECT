@@ -185,7 +185,7 @@ class TextPreProcessing(object):
         for c in drop_classes:
             drop_num = len(X[X['prdtypecode'].astype(str) == c]) - threshold
             print("class {}, drop_num: {}".format(c, drop_num))
-            candidate = X[(X['prdtypecode'].astype(str) == c) & (X['language'].str.upper() != Target_Language)]
+            candidate = X[(X['prdtypecode'].astype(str) == c) & (X['language'].str.upper() != "EN")]
             if len(candidate) < drop_num:
                 print("Warning: remaining data to be dropped is not enough, please redefine the dropping rule!")
                 return X, dropped_data
