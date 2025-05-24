@@ -48,7 +48,7 @@ def main():
 
     # Set OPENAI API key
     if not os.path.exists(OPENAI_API_KEY_FILE):
-        print(f"Please create a file named {OPENAI_API_KEY_FILE} that contains your deepl API key.")
+        print(f"Please create a file named {OPENAI_API_KEY_FILE} that contains your OPENAI API key.")
         return
     api_key = ""
     with open(OPENAI_API_KEY_FILE, 'r') as file:
