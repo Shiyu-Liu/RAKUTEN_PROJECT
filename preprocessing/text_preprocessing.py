@@ -324,6 +324,12 @@ class TextPreProcessing(object):
         except FileNotFoundError as e:
             print("Please check the file provided, error message:{}".format(e))
             return
+
+        # filter augmented data that has inconsistent textual description
+        augmented = augmented.dropna()
+        augmented = augmented[augmented['text'].apply(lambda x: len(x.split()))>Filtering_Params['min_words_length']]
+
+        # find the minority class
         target_size = Filtering_Params['target_sample_size']
         minority_class_size = text_data['prdtypecode'].value_counts()[text_data['prdtypecode'].value_counts()<target_size] + \
             augmented['prdtypecode'].value_counts()
