@@ -313,6 +313,46 @@ class TextPreProcessing(object):
         if save_csv:
             self.text_data.to_csv(os.path.join(self.data_path, SaveDataFilename+'_final.csv'), sep=';')
 
+    def preprocess_step5(self, csv=None):
+        if csv is None:
+            print("Please provide the data file.")
+            return
+        csv_aug = os.path.splitext(csv)[0]+'_augmented.csv'
+        try:
+            text_data = pd.read_csv(os.path.join(self.save_path, csv), delimiter=';', index_col=0)
+            augmented = pd.read_csv(os.path.join(self.save_path, csv_aug), delimiter=';', index_col=0)
+        except FileNotFoundError as e:
+            print("Please check the file provided, error message:{}".format(e))
+            return
+        target_size = Filtering_Params['target_sample_size']
+        minority_class_size = text_data['prdtypecode'].value_counts()[text_data['prdtypecode'].value_counts()<target_size] + \
+            augmented['prdtypecode'].value_counts()
+        print("Minority class size in total:\n", minority_class_size)
+        new_samples = pd.DataFrame()
+        dropped_new_samples = pd.DataFrame()
+        # drop augmented data for which the total size (including existing samples) is greater than target size
+        for idx, val in zip(minority_class_size.index, minority_class_size.values):
+            new_data = augmented[augmented['prdtypecode']==idx]
+            if val == target_size:
+                new_samples = pd.concat([new_samples, new_data], axis=0)
+            elif val < target_size:
+                print(f"Warning: augmented data is not enough for index {idx} (size: {val}, target size: {target_size})")
+                print("Preprocessing aborted, please generate the augmented data again!")
+                return
+            else:
+                diff = val - target_size
+                dropped_data = new_data.sample(n=diff, random_state=27)
+                new_data = new_data.drop(dropped_data.index)
+                new_samples = pd.concat([new_samples, new_data], axis=0)
+                dropped_new_samples = pd.concat([dropped_new_samples, dropped_data], axis=0)
+        # reset index for augmented data
+        last_index = text_data.index[-1]
+        new_samples.index = range(last_index+1, last_index+1+new_samples.shape[0])
+
+        # save data
+        save_data = pd.concat([text_data, new_samples], axis=0)
+        save_data.to_csv(os.path.join(self.data_path, SaveDataFilename+'.csv'), sep=';')
+
     def print_info(self):
         if self.data_path is None:
             return
@@ -345,7 +385,7 @@ def main():
     csv = ""
     if len(sys.argv) > 2:
         step = int(sys.argv[2])
-        if step not in {1,2,3,4}:
+        if step not in {1,2,3,4,5}:
             print("Unable to parse step input: {}".format(step))
             step = 0
         else:
@@ -371,6 +411,8 @@ def main():
             t_prep.preprocess_step3(csv, True)
         case 4:
             t_prep.preprocess_step4(csv, True)
+        case 5:
+            t_prep.preprocess_step5(csv)
 
 if __name__=="__main__":
     main()
