@@ -252,8 +252,9 @@ class TextPreProcessing(object):
                 X.loc[idx, 'title'] = title
                 print("Extracted Title:", title)
             else:
-                X.loc[idx, 'title'] = text
-                print("Put default text as title:", text)
+                title = text.splitlines()[0]
+                X.loc[idx, 'title'] = title
+                print("Put default text as title:", title)
 
             match_trans = re.search(r'Translation:\s*(.*)', text)
             if match_trans:
