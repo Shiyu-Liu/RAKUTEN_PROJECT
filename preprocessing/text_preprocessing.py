@@ -282,7 +282,7 @@ class TextPreProcessing(object):
             texts.append(text)
         return pd.Series(data=texts, index=X.index)
 
-    def preprocess_step4(self, csv=None, save_csv=False, split: int=0):
+    def preprocess_step4(self, csv=None, save_csv=False):
         if csv is None and self.text_data is None:
             print("Performing the preprocessing steps first or load from a file.")
             return
