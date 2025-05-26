@@ -311,7 +311,7 @@ class TextPreProcessing(object):
         self.text_data = self.text_data[['raw_text', 'raw_translation', 'text', 'prdtypecode']]
 
         if save_csv:
-            self.text_data.to_csv(os.path.join(self.data_path, SaveDataFilename+'_final.csv'), sep=';')
+            self.text_data.to_csv(os.path.join(self.save_path, SaveDataFilename+'_final.csv'), sep=';')
 
     def preprocess_step5(self, csv=None):
         if csv is None:
