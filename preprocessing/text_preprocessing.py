@@ -270,6 +270,18 @@ class TextPreProcessing(object):
                         print("Use translation {} for text {}".format(translation, title))
         return X
 
+    def clean_text_final(self, X: pd.Series):
+        texts = []
+        rows = X.shape[0]
+        for i, text in enumerate(X):
+            # remove unwanted special characters (keeping symbolic letters and whitespace)
+            text = re.sub(r'[^a-zA-Z\s\'À-ÿäöüÄÖÜß]', ' ', text, flags=re.UNICODE)
+            # remove multiple whitespace characters and the leading/trailing whitespace
+            text = re.sub(r'\s+', ' ', text).lstrip().rstrip()
+            print("Cleaning row {}/{}".format(i+1, rows))
+            texts.append(text)
+        return pd.Series(data=texts, index=X.index)
+
     def preprocess_step4(self, csv=None, save_csv=False, split: int=0):
         if csv is None and self.text_data is None:
             print("Performing the preprocessing steps first or load from a file.")
@@ -293,6 +305,8 @@ class TextPreProcessing(object):
                                'title': 'text',
                                'translated_text':'raw_translation'},
                                axis=1, inplace=True)
+
+        self.text_data['text'] = self.clean_text_final(self.text_data['text'])
 
         self.text_data = self.text_data[['raw_text', 'raw_translation', 'text', 'prdtypecode']]
 
