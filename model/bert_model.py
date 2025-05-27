@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, classification_report
 
 SaveDirName="results_bert"
+NUM_SAMPLES=1000
 
 class BertModel(object):
     dataset = None
@@ -36,9 +37,18 @@ class BertModel(object):
             print(f"Failed loading pretrained Bert model, error message: {e}")
 
     def encode(self):
+        # down-sample the dataset to be able to train the bert model within acceptable time
+        target_index = self.dataset['prdtypecode'].value_counts().index
+        downsampled_dataset = pd.DataFrame()
+        for idx in target_index:
+            samples = self.dataset[self.dataset['prdtypecode']==idx].sample(n=NUM_SAMPLES, random_state=27)
+            downsampled_dataset = pd.concat([downsampled_dataset, samples], axis=0)
+        downsampled_dataset.sort_index(inplace=True)
+        print(downsampled_dataset['prdtypecode'].value_counts())
+
         # preparation of train/test data:
-        self.y = self.dataset['prdtypecode']
-        self.X = self.dataset['text']
+        self.y = downsampled_dataset['prdtypecode']
+        self.X = downsampled_dataset['text']
 
         # encode y data, by replacing the list of product type code with range(N)
         target_length = len(self.y.value_counts().index)
