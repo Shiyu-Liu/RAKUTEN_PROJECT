@@ -4,13 +4,14 @@ import sys
 import pandas as pd
 import numpy as np
 from datasets import Dataset
-from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
 from transformers import DataCollatorWithPadding
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, classification_report
 
 SaveDirName="results_bert"
-NUM_SAMPLES=500
+MODEL_NAME = "distilbert-base-uncased"
+NUM_SAMPLES= 500
 DOWNSAMPLE = False
 
 class BertModel(object):
@@ -31,10 +32,10 @@ class BertModel(object):
         self.encode()
         num_labels = self.y.value_counts().shape[0]
         print(f"Number of labels to be classified: {num_labels}")
-        print(f"Training model: {model_name}")
+        print(f"Training model: {MODEL_NAME}")
         try:
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-            self.model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
+            self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+            self.model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=num_labels)
         except Exception as e:
             print(f"Failed loading pretrained Bert model, error message: {e}")
 
