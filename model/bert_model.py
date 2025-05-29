@@ -10,7 +10,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, classification_report
 
 SaveDirName="results_bert"
-NUM_SAMPLES=1000
+NUM_SAMPLES=500
+DOWNSAMPLE = False
 
 class BertModel(object):
     dataset = None
@@ -29,21 +30,25 @@ class BertModel(object):
             os.makedirs(self.save_path)
         self.encode()
         num_labels = self.y.value_counts().shape[0]
-        print("Number of labels to be classified:", num_labels)
+        print(f"Number of labels to be classified: {num_labels}")
+        print(f"Training model: {model_name}")
         try:
-            self.tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-            self.model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=num_labels)
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            self.model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
         except Exception as e:
             print(f"Failed loading pretrained Bert model, error message: {e}")
 
     def encode(self):
-        # down-sample the dataset to be able to train the bert model within acceptable time
-        target_index = self.dataset['prdtypecode'].value_counts().index
-        downsampled_dataset = pd.DataFrame()
-        for idx in target_index:
-            samples = self.dataset[self.dataset['prdtypecode']==idx].sample(n=NUM_SAMPLES, random_state=27)
-            downsampled_dataset = pd.concat([downsampled_dataset, samples], axis=0)
-        downsampled_dataset.sort_index(inplace=True)
+        if DOWNSAMPLE:
+            # down-sample the dataset to be able to train the bert model within acceptable time
+            target_index = self.dataset['prdtypecode'].value_counts().index
+            downsampled_dataset = pd.DataFrame()
+            for idx in target_index:
+                samples = self.dataset[self.dataset['prdtypecode']==idx].sample(n=NUM_SAMPLES, random_state=27)
+                downsampled_dataset = pd.concat([downsampled_dataset, samples], axis=0)
+            downsampled_dataset.sort_index(inplace=True)
+        else:
+            downsampled_dataset = self.dataset
         print(downsampled_dataset['prdtypecode'].value_counts())
 
         # preparation of train/test data:
