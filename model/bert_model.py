@@ -5,7 +5,8 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from datasets import Dataset
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import Trainer, TrainingArguments, TrainerCallback
 from transformers import DataCollatorWithPadding
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, classification_report
@@ -14,6 +15,14 @@ SaveDirName="results_distilbert"
 MODEL_NAME = "distilbert-base-uncased"
 NUM_SAMPLES= 500
 DOWNSAMPLE = False
+
+class ScoreLoggerCallback(TrainerCallback):
+    def __init__(self):
+        self.logs = []
+
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        if logs:
+            self.logs.append(logs.copy())
 
 class BertModel(object):
     dataset = None
@@ -37,6 +46,7 @@ class BertModel(object):
         try:
             self.tokenizer = AutoTokenizer.from_pretrained(model)
             self.model = AutoModelForSequenceClassification.from_pretrained(model, num_labels=num_labels)
+            self.score_logger = ScoreLoggerCallback()
         except Exception as e:
             print(f"Failed loading pretrained Bert model, error message: {e}")
 
@@ -123,6 +133,7 @@ class BertModel(object):
             eval_dataset=self.val_dataset,
             compute_metrics=self.compute_metrics,
             data_collator=data_collator,
+            callbacks=[self.score_logger],
         )
 
         # train the model
@@ -158,7 +169,9 @@ class BertModel(object):
         df_cm.to_csv(os.path.join(self.save_path, 'confusion_matrix.csv'))
         df_report.to_csv(os.path.join(self.save_path, 'classification_report.csv'))
         self.trainer.save_model(path)
-
+        # save training los
+        log_df = pd.DataFrame(self.score_logger.logs)
+        log_df.to_csv("training_logs.csv", index=False)
 
 def main():
     if len(sys.argv) < 2:
