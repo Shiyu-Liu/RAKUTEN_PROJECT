@@ -62,12 +62,19 @@ class BertModel(object):
         self.index = self.y.value_counts().index.sort_values()
         self.y.replace(to_replace=self.index, value=range(0,target_length), inplace=True)
 
-        # train/test split
-        X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, test_size=0.2, random_state=27)
+        # train/validation/test split
+        X_train, X_temp, y_train, y_temp = train_test_split(self.X, self.y, test_size=0.3, random_state=27, stratify=self.y)
+        X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=27, stratify=y_temp)
 
         # prepare datasets for training/evaluating with pretrained bert model
         self.train_dataset = Dataset.from_dict({"text": X_train, "label": y_train})
-        self.eval_dataset = Dataset.from_dict({"text": X_test, "label": y_test})
+        self.val_dataset = Dataset.from_dict({"text": X_val, "label": y_val})
+        self.test_dataset = Dataset.from_dict({"text": X_test, "label": y_test})
+
+        # save train/val/test sets
+        self.train_dataset.to_csv(os.path.join(self.save_path, "train_dataset.csv"))
+        self.val_dataset.to_csv(os.path.join(self.save_path, "val_dataset.csv"))
+        self.test_dataset.to_csv(os.path.join(self.save_path, "test_set.csv"))
 
     def tokenize_function(self, batch):
         return self.tokenizer(batch['text'], padding="max_length", truncation=True, max_length=128)
@@ -82,11 +89,13 @@ class BertModel(object):
     def train(self):
         # tokenize
         self.train_dataset = self.train_dataset.map(self.tokenize_function, batched=True)
-        self.eval_dataset = self.eval_dataset.map(self.tokenize_function, batched=True)
+        self.val_dataset = self.val_dataset.map(self.tokenize_function, batched=True)
+        self.test_dataset = self.test_dataset.map(self.tokenize_function, batched=True)
 
         # set pytorch format
         self.train_dataset.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])
-        self.eval_dataset.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])
+        self.val_dataset.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])
+        self.test_dataset.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])
 
         # training arguments
         training_args = TrainingArguments(
@@ -111,7 +120,7 @@ class BertModel(object):
             model=self.model,
             args=training_args,
             train_dataset=self.train_dataset,
-            eval_dataset=self.eval_dataset,
+            eval_dataset=self.val_dataset,
             compute_metrics=self.compute_metrics,
             data_collator=data_collator,
         )
@@ -125,7 +134,7 @@ class BertModel(object):
         print(eval_result)
 
         # make predictions
-        predictions = self.trainer.predict(self.eval_dataset)
+        predictions = self.trainer.predict(self.test_dataset)
         y_true = predictions.label_ids
         y_pred = np.argmax(predictions.predictions, axis=1)
 
