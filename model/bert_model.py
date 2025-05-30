@@ -154,8 +154,9 @@ class BertModel(object):
         path = os.path.join(self.save_path, "saved_model")
         if not os.path.exists(path):
             os.makedirs(path)
-        df_cm.to_csv(os.path.join(self.save_path, 'bert_cm.csv'))
-        df_report.to_csv(os.path.join(self.save_path, 'bert_report.csv'))
+        # save model and metrics
+        df_cm.to_csv(os.path.join(self.save_path, 'confusion_matrix.csv'))
+        df_report.to_csv(os.path.join(self.save_path, 'classification_report.csv'))
         self.trainer.save_model(path)
 
 
