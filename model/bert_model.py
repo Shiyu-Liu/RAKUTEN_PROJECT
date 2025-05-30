@@ -3,13 +3,14 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+from datetime import datetime
 from datasets import Dataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
 from transformers import DataCollatorWithPadding
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, classification_report
 
-SaveDirName="results_bert"
+SaveDirName="results_distilbert"
 MODEL_NAME = "distilbert-base-uncased"
 NUM_SAMPLES= 500
 DOWNSAMPLE = False
@@ -26,7 +27,7 @@ class BertModel(object):
             print("Please check the file provided")
             return
         path = os.path.dirname(os.path.abspath(__file__))
-        self.save_path = os.path.join(path, SaveDirName)
+        self.save_path = os.path.join(path, SaveDirName, datetime.today().strftime('%Y-%m-%d_%H-%M-%S'))
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
         self.encode()
