@@ -19,7 +19,7 @@ class BertModel(object):
     dataset = None
     save_path = None
     trainer = None
-    def __init__(self, file):
+    def __init__(self, file, model=MODEL_NAME):
         # read data from preprocessed file
         try:
             self.dataset = pd.read_csv(file, index_col=0, delimiter=';')
@@ -33,10 +33,10 @@ class BertModel(object):
         self.encode()
         num_labels = self.y.value_counts().shape[0]
         print(f"Number of labels to be classified: {num_labels}")
-        print(f"Training model: {MODEL_NAME}")
+        print(f"Training model: {model}")
         try:
-            self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-            self.model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=num_labels)
+            self.tokenizer = AutoTokenizer.from_pretrained(model)
+            self.model = AutoModelForSequenceClassification.from_pretrained(model, num_labels=num_labels)
         except Exception as e:
             print(f"Failed loading pretrained Bert model, error message: {e}")
 
@@ -156,7 +156,13 @@ def main():
         return 0
     file = sys.argv[1]
 
-    bert = BertModel(file)
+    model_str = ""
+    if len(sys.argv)>2:
+        model_str = sys.argv[2]
+    else:
+        model_str = MODEL_NAME
+
+    bert = BertModel(file, model_str)
     try:
         bert.train()
         df_cm, df_report = bert.evaluate()
