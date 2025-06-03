@@ -15,6 +15,7 @@ SaveDirName="results_distilbert"
 MODEL_NAME = "distilbert-base-uncased"
 NUM_SAMPLES= 500
 DOWNSAMPLE = False
+TRAIN_EPOCH= 5
 
 class ScoreLoggerCallback(TrainerCallback):
     def __init__(self):
@@ -115,7 +116,7 @@ class BertModel(object):
             learning_rate=2e-5,
             per_device_train_batch_size=16,
             per_device_eval_batch_size=64,
-            num_train_epochs=3,
+            num_train_epochs=TRAIN_EPOCH,
             weight_decay=0.01,
             save_steps=500,
             logging_dir=self.save_path,
