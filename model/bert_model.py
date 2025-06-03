@@ -172,7 +172,7 @@ class BertModel(object):
         self.trainer.save_model(path)
         # save training los
         log_df = pd.DataFrame(self.score_logger.logs)
-        log_df.to_csv("training_logs.csv", index=False)
+        log_df.to_csv(os.path.join(self.save_path, 'training_logs.csv'), index=False)
 
 def main():
     if len(sys.argv) < 2:
