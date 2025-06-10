@@ -161,6 +161,19 @@ class SimpleModel(object):
         else:
             self.save_results(model, df_cm, df_report, modeltype)
 
+    def load_evaluate_model(self, modeltype: str):
+        print(f"Evaluating the pretrained {modeltype} model")
+        try:
+            modelfile = os.path.join(self.save_path, modeltype+"_model.pkl")
+            model = joblib.load(modelfile)
+            print(model)
+        except Exception as e:
+            print(f'Failed to load {modeltype} model in {self.save_path}, error message: {e}')
+            return
+        df_cm, df_report = self.evaluate(model, self.X_train, self.y_train)
+        df_cm.to_csv(os.path.join(self.save_path, modeltype+'_train_cm.csv'))
+        df_report.to_csv(os.path.join(self.save_path, modeltype+'_train_report.csv'))
+
     def visualize(self):
         # reduce the dimension of TF-IDF matrix for visualization
         svd = TruncatedSVD(n_components=2, random_state=27)
@@ -186,12 +199,19 @@ def main():
             print(f"Model type {modeltype} is not supported, please select among 'SVM', 'RF' and 'XGB'.")
             return 0
 
+    eval = False
+    if len(sys.argv) > 3:
+        eval = bool(sys.argv[3])
+
     model = SimpleModel(file)
-    try:
-        model.train(modeltype)
-        model.visualize()
-    except KeyboardInterrupt:
-        print("Interrupt by keyboard")
+    if eval:
+        model.load_evaluate_model(modeltype)
+    else:
+        try:
+            model.train(modeltype)
+            model.visualize()
+        except KeyboardInterrupt:
+            print("Interrupt by keyboard")
 
 if __name__=="__main__":
     main()
