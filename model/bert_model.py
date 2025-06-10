@@ -143,13 +143,13 @@ class BertModel(object):
         # train the model
         self.trainer.train()
 
-    def evaluate(self):
+    def evaluate(self, test_dataset):
         # evaluate
         eval_result = self.trainer.evaluate()
         print(eval_result)
 
         # make predictions
-        predictions = self.trainer.predict(self.test_dataset)
+        predictions = self.trainer.predict(test_dataset)
         y_true = predictions.label_ids
         y_pred = np.argmax(predictions.predictions, axis=1)
 
