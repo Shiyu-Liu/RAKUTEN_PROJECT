@@ -85,7 +85,7 @@ class SimpleModel(object):
         report = classification_report(y_test, y_pred, output_dict=True)
         df_report = pd.DataFrame(report).transpose()
         df_report.rename(index=dict(zip(df_report.index, self.index)), inplace=True)
-        print(self.df_report.round(2))
+        print(df_report.round(2))
         return df_cm, df_report
 
     def save_results(self, model, df_cm, df_report, modeltype, compressed=False):
@@ -146,13 +146,13 @@ class SimpleModel(object):
         print(f"Training a simple model with type {modeltype}")
         if modeltype=="SVM":
             model = self.train_svm()
-            df_cm, df_report = self.evaluate(model, self.X_test, self.y_test, "SVM")
+            df_cm, df_report = self.evaluate(model, self.X_test, self.y_test)
         elif modeltype=="RF":
             model = self.train_rf()
-            df_cm, df_report = self.evaluate(model, self.X_test, self.y_test, "RF")
+            df_cm, df_report = self.evaluate(model, self.X_test, self.y_test)
         elif modeltype=="XGB":
             model = self.train_xgb()
-            df_cm, df_report = self.evaluate(model, self.X_test, self.y_test, "XGB")
+            df_cm, df_report = self.evaluate(model, self.X_test, self.y_test)
         else:
             print(f'{modeltype} as model is not supported')
         
