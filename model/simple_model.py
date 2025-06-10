@@ -14,7 +14,7 @@ import xgboost as xgb
 import joblib
 
 MAX_VECTORIZATION_FEATURE = 3000
-SaveDirName="results"
+SaveDirName="results/simple_textual_model"
 
 class SimpleModel(object):
     dataset = None
