@@ -197,7 +197,7 @@ def main():
     df_report_text = pd.DataFrame(classification_report(y_test, y_pred_text, output_dict=True)).transpose()
     print("Text model:\n", df_report_text.round(2))
     df_report_img = pd.DataFrame(classification_report(y_test, y_pred_img, output_dict=True)).transpose()
-    print("Text model:\n", df_report_img.round(2))
+    print("Image model:\n", df_report_img.round(2))
     df_report = pd.DataFrame(classification_report(y_test, y_pred, output_dict=True)).transpose()
     print("Fusion model:\n", df_report.round(2))
 
