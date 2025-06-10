@@ -14,6 +14,7 @@ TEXT_FILE = "../data/text_data_clean.csv"
 X_TRAIN_FILE = "../data/X_train.csv"
 IMAGE_RATIO = "../data/x_train_with_ratios.csv"
 IMAGE_DIR = "../data/images/image_train_zoomed"
+IMAGE_TEST_SET = "../data/image_data_val.csv"
 TEST_SET_OUTPUT = "../data/test_set_final_evaluation.csv"
 OUTPUT_DIR = "results/fusion_model"
 TEXT_PROB_OUTPUT = "text_pred_prob.csv"
@@ -29,7 +30,7 @@ BEST_TEXT_MODEL = "results/distilbert_best_model/saved_model"
 
 WEIGHTS = [3, 2]  # weights of [textual, image] model
 
-def prepare_test_set():
+def prepare_test_set_new():
     text_data = pd.read_csv(TEXT_FILE, delimiter=';', index_col=0)
     X_train = pd.read_csv(X_TRAIN_FILE, index_col=0)
     ratio = pd.read_csv(IMAGE_RATIO)
@@ -46,6 +47,32 @@ def prepare_test_set():
     print("Test set Distribution:\n", y_test.value_counts())
 
     test_dataset = pd.concat([X_test, X_train.loc[X_test.index, 'imagefile'], y_test.loc[X_test.index]], axis=1)
+    missing_file = test_dataset['imagefile'].apply(lambda x: x in missing_images)
+    if any(missing_file.astype(bool)==True):
+        image_file = test_dataset.loc[missing_file.astype(bool)==True, 'imagefile']
+        print(f"Following image files are missing:\n{image_file}")
+        return False
+    print(test_dataset.head())
+    test_dataset = test_dataset.sort_index(ascending=True)
+    test_dataset.to_csv(TEST_SET_OUTPUT, sep=';')
+    return True
+
+def prepare_test_set():
+    text_data = pd.read_csv(TEXT_FILE, delimiter=';', index_col=0)
+    image_test_set = pd.read_csv(IMAGE_TEST_SET, delimiter=';', index_col=0)
+    print(image_test_set.head())
+    image_test_set['imagefile'] = "image_"+image_test_set['imageid'].astype(str)+"_product_"+image_test_set['productid'].astype(str)+".jpg"
+
+    _, text_test_set, _, text_y_test = train_test_split(text_data['text'], text_data['prdtypecode'], test_size=0.3, random_state=27, stratify=text_data['prdtypecode'])
+    text_test_set = text_test_set.sort_index(ascending=True)
+
+    common_idx = text_test_set.index.intersection(image_test_set.index)
+    image_test_common = image_test_set.loc[common_idx].sort_index(ascending=True)
+    text_test_common = text_test_set.loc[common_idx].sort_index(ascending=True)
+    y_test_common = text_y_test.loc[common_idx].sort_index(ascending=True)
+
+    print("Test set distribution:\n", text_data.loc[common_idx, 'prdtypecode'].value_counts())
+    test_dataset = pd.concat([text_test_common, image_test_common['imagefile'], y_test_common], axis=1)
     missing_file = test_dataset['imagefile'].apply(lambda x: x in missing_images)
     if any(missing_file.astype(bool)==True):
         image_file = test_dataset.loc[missing_file.astype(bool)==True, 'imagefile']
