@@ -9,6 +9,8 @@ from keras.models import load_model
 from keras.applications.efficientnet import preprocess_input
 from keras.preprocessing.image import load_img, img_to_array
 from sklearn.metrics import confusion_matrix, classification_report
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 TEXT_FILE = "../data/text_data_clean.csv"
 X_TRAIN_FILE = "../data/X_train.csv"
@@ -176,7 +178,18 @@ def main():
     y_pred_img.to_csv(os.path.join(OUTPUT_DIR, 'y_pred_img.csv'))
 
     # confusion matrix
-    cm = confusion_matrix(y_test, y_pred)
+    cm = confusion_matrix(y_test, y_pred, labels=labels, normalize='true')
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(cm, annot=True, fmt=".2f", cmap='Blues',
+                xticklabels=labels, yticklabels=labels,
+                cbar_kws={'label': 'Proportion'})
+
+    plt.xlabel('Predicted Class', fontsize=14)
+    plt.ylabel('Real Class', fontsize=14)
+    plt.xticks(rotation=45)
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+    plt.show()
     df_cm = pd.DataFrame(cm, index=[f"Actual {label}" for label in labels],
                         columns=[f"Predicted {label}" for label in labels])
     print(df_cm)
