@@ -165,6 +165,13 @@ class BertModel(object):
         print(df_report.round(2))
         return df_cm, df_report
 
+    def evaluate_train_scores(self):
+        print('Evalutating train scores')
+        self.setup_trainer()
+        df_cm, df_report = self.evaluate(self.train_dataset)
+        df_cm.to_csv(os.path.join(self.save_path, 'train_confusion_matrix.csv'))
+        df_report.to_csv(os.path.join(self.save_path, 'train_classification_report.csv'))
+
     def save_results(self, df_cm, df_report):
         path = os.path.join(self.save_path, "saved_model")
         if not os.path.exists(path):
@@ -189,13 +196,20 @@ def main():
     else:
         model_str = MODEL_NAME
 
+    eval = False
+    if len(sys.argv) > 3:
+        eval = bool(sys.argv[3])
+
     bert = BertModel(file, model_str)
-    try:
-        bert.train()
-        df_cm, df_report = bert.evaluate()
-        bert.save_results(df_cm, df_report)
-    except Exception as e:
-        print(f"Failed training Bert model, error message: {e}")
+    if eval:
+        bert.evaluate_train_scores()
+    else:
+        try:
+            bert.train()
+            df_cm, df_report = bert.evaluate()
+            bert.save_results(df_cm, df_report)
+        except Exception as e:
+            print(f"Failed training Bert model, error message: {e}")
 
 
 if __name__=='__main__':
