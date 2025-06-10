@@ -40,8 +40,7 @@ class BertModel(object):
         self.save_path = os.path.join(path, SaveDirName, datetime.today().strftime('%Y-%m-%d_%H-%M-%S'))
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
-        self.encode()
-        num_labels = self.y.value_counts().shape[0]
+        num_labels = self.dataset['prdtypecode'].value_counts().shape[0]
         print(f"Number of labels to be classified: {num_labels}")
         print(f"Training model: {model}")
         try:
@@ -50,6 +49,7 @@ class BertModel(object):
             self.score_logger = ScoreLoggerCallback()
         except Exception as e:
             print(f"Failed loading pretrained Bert model, error message: {e}")
+        self.encode()
 
     def encode(self):
         if DOWNSAMPLE:
@@ -87,17 +87,6 @@ class BertModel(object):
         self.val_dataset.to_csv(os.path.join(self.save_path, "val_dataset.csv"))
         self.test_dataset.to_csv(os.path.join(self.save_path, "test_set.csv"))
 
-    def tokenize_function(self, batch):
-        return self.tokenizer(batch['text'], padding="max_length", truncation=True, max_length=128)
-
-    def compute_metrics(self, eval_pred):
-        logits, labels = eval_pred
-        predictions = np.argmax(logits, axis=1)
-        acc = accuracy_score(labels, predictions)
-        f1 = f1_score(labels, predictions, average="weighted")
-        return {"accuracy": acc, "f1": f1}
-
-    def train(self):
         # tokenize
         self.train_dataset = self.train_dataset.map(self.tokenize_function, batched=True)
         self.val_dataset = self.val_dataset.map(self.tokenize_function, batched=True)
@@ -108,6 +97,17 @@ class BertModel(object):
         self.val_dataset.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])
         self.test_dataset.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])
 
+    def tokenize_function(self, batch):
+        return self.tokenizer(batch['text'], padding="max_length", truncation=True, max_length=128)
+
+    def compute_metrics(self, eval_pred):
+        logits, labels = eval_pred
+        predictions = np.argmax(logits, axis=1)
+        acc = accuracy_score(labels, predictions)
+        f1 = f1_score(labels, predictions, average="weighted")
+        return {"accuracy": acc, "f1": f1}
+
+    def setup_trainer(self):
         # training arguments
         training_args = TrainingArguments(
             output_dir=self.save_path,
@@ -137,6 +137,9 @@ class BertModel(object):
             callbacks=[self.score_logger],
         )
 
+    def train(self):
+        # set up trainer
+        self.setup_trainer()
         # train the model
         self.trainer.train()
 
