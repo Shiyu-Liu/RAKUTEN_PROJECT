@@ -18,6 +18,11 @@ labels = pd.read_csv('data/class_category.csv', delimiter=';', index_col=None)
 labels.columns = ["Product Type Code", "Product Category"]
 labels.index = [''] * len(labels) # set the index to an empty string to hide row index
 
+ori_dataset_backend = original_dataset.copy()
+ori_dataset_backend['filename'] = "image_"+ori_dataset_backend['imageid'].astype(str)+"_product_"+ori_dataset_backend['productid'].astype(str)+".jpg"
+ori_dataset_backend['description'] = ori_dataset_backend['description'].fillna("")
+ori_dataset_backend['text'] = ori_dataset_backend['designation'] + " " + ori_dataset_backend['description']
+
 img_class_dist = Image.open("figures/class_dist.jpg").convert("RGB")
 width, height = img_class_dist.size
 img_class_dist = img_class_dist.crop((0, 60, width, height))
@@ -41,18 +46,89 @@ if page == pages[1]:
     st.write("There are a priori some specific classes that are frequently confused even by human. Examples are the following:")
     st.markdown("""
         - Class 10 (used book) and class 2705 (new book)
-        - Class 1180 (board games), class 1280 (chidren's toys) and class 1281 (social games)
+        - Class 1180 (board games), class 1280 (children's toys) and class 1281 (social games)
         - Class 40 (video game) and class 2905 (PC game)
         """
     )
     st.markdown("---")
     st.markdown("#### 📊 Class Distribution")
     st.write("The target classes of the entire data samples are imbalanced, with the majority class 2583 (poolside items) containing over 10k samples, while the minority classes represent" \
-        "only about 1% of the entire data.")
+        " only about 1% of the entire data.")
     st.image(img_class_dist, caption="Distribution of Data Samples across Target Classes", use_container_width=True)
 
     st.markdown("---")
     st.markdown("#### 📌 Data Examples")
+    st.markdown("🔺 **Class 10 (used book) V.S. Class 2705 (new book)**")
+    col1, col2 = st.columns(2)
+    with col1:
+        with st.container():
+            st.markdown(
+                "<div style='text-align: center; color: gray;'>Example: Class 10 (used book)</div>",
+                unsafe_allow_html=True
+            )
+            st.image("figures/examples/class_10_index_477.jpg")
+            with st.expander("Text Description"):
+                st.markdown(f"**Text:** {ori_dataset_backend.loc[477,'text']}")
+    with col2:
+        with st.container():
+            st.markdown(
+                "<div style='text-align: center; color: gray;'>Example: Class 2705 (new book)</div>",
+                unsafe_allow_html=True
+            )
+            st.image("figures/examples/class_2705_index_82160.jpg")
+            with st.expander("Text Description"):
+                st.markdown(f"**Text:** {ori_dataset_backend.loc[82160,'text']}")
+    st.markdown("\n\n")
+    st.markdown("🔺 **Class 1180 (board games) V.S. Class 1280 (children's toy) V.S. Class 1281 (social games)**")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        with st.container():
+            st.markdown(
+                "<div style='text-align: center; color: gray;'>Example: Class 1180 (board games)</div>",
+                unsafe_allow_html=True
+            )
+            st.image("figures/examples/class_1180_index_8206.jpg")
+            with st.expander("Text Description"):
+                st.markdown(f"**Text:** {ori_dataset_backend.loc[8206,'text']}")
+    with col2:
+        with st.container():
+            st.markdown(
+                "<div style='text-align: center; color: gray;'>Example: Class 1280 (children's toy)</div>",
+                unsafe_allow_html=True
+            )
+            st.image("figures/examples/class_1280_index_5601.jpg")
+            with st.expander("Text Description"):
+                st.markdown(f"**Text:** {ori_dataset_backend.loc[5601,'text']}")
+    with col3:
+        with st.container():
+            st.markdown(
+                "<div style='text-align: center; color: gray;'>Example: Class 1281 (social games)</div>",
+                unsafe_allow_html=True
+            )
+            st.image("figures/examples/class_1281_index_4467.jpg")
+            with st.expander("Text Description"):
+                st.markdown(f"**Text:** {ori_dataset_backend.loc[4467,'text']}")
+    st.markdown("\n\n")
+    st.markdown("🔺 **Class 40 (video game) V.S. Class 2905 (PC game)**")
+    col1, col2 = st.columns(2)
+    with col1:
+        with st.container():
+            st.markdown(
+                "<div style='text-align: center; color: gray;'>Example: Class 40 (video game)</div>",
+                unsafe_allow_html=True
+            )
+            st.image("figures/examples/class_40_index_2573.jpg")
+            with st.expander("Text Description"):
+                st.markdown(f"**Text:** {ori_dataset_backend.loc[2573,'text']}")
+    with col2:
+        with st.container():
+            st.markdown(
+                "<div style='text-align: center; color: gray;'>Example: Class 2905 (PC game)</div>",
+                unsafe_allow_html=True
+            )
+            st.image("figures/examples/class_2905_index_33509.jpg")
+            with st.expander("Text Description"):
+                st.markdown(f"**Text:** {ori_dataset_backend.loc[33509,'text']}")
 
 if page == pages[2]:
     st.write("### Preprocessing of data")
