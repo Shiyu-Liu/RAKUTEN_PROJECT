@@ -13,6 +13,7 @@ page=st.sidebar.radio("Go to", pages)
 original_dataset = pd.read_csv('../data/X_train.csv', index_col=0)
 y_ori = pd.read_csv('../data/Y_train.csv', index_col=0)
 original_dataset = pd.concat([original_dataset, y_ori], axis=1)
+preprocessed_dataset = pd.read_csv('../data/text_data_clean.csv', delimiter=';', index_col=0)
 
 labels = pd.read_csv('data/class_category.csv', delimiter=';', index_col=None)
 labels.columns = ["Product Type Code", "Product Category"]
@@ -133,6 +134,78 @@ if page == pages[1]:
 if page == pages[2]:
     st.write("### Preprocessing of data")
     tab1, tab2 = st.tabs(["Textual Data", "Image Data"])
+
+    # Textual Data Preprocessing
+    with tab1:
+        st.markdown("#### 📸 General Issues")
+        st.markdown("""
+            - Presence of special characters and HTML tags, which carry no semantic meaning.
+            - Excessively long texts in some of the samples caused by overly detailed specifications.
+            - Presence of a variety of languages, apart from the majority of the text in Frence.
+            - Class imbalance among all the samples.
+            """
+        )
+
+        st.markdown("---")
+        st.markdown("#### 🔍 Text Cleaning and Filtering")
+        st.write("Text cleaning was performed on all the data samples, more specifically, the team has:")
+        st.markdown("""
+            - Removed HTML tags and special characters except a few symbols (e.g., é, ', ß);
+            - Eliminated common unit patterns such as "xx cm", "xx kg", "Axx", "Øxx", and "N°";
+            - Removed the remaining numerical contents that indicates dimensions.
+            """
+        )
+
+        st.markdown("\n")
+        st.write("In terms of text filtering, we set up filtering criteria as follows:")
+        st.markdown("""
+            - Total word count of each sample's text within **100 words**;
+            - **Sample size of 2500** per class.
+            """
+        )
+        with st.expander("Distribution of Word Counts"):
+            st.image("figures/word_count_dist.jpg", caption="Distribution of word counts across target classes", use_container_width=True)
+
+        st.markdown("---")
+        st.markdown("#### 🏷️ Text Translation & Class Balancing")
+        st.write("We leveraged the OpenAI-API and used ChatGPT-4.1-nano model to translate all the text into a unified language. The target language is **English**.")
+        with st.expander("Distribution of Text Languages"):
+            st.image("figures/language_dist.jpg", caption="Distribution of data samples across target classes and languages", use_container_width=True)
+
+        st.write("The ChatGPT-4.1-nano model is also used to generate dummy text by paraphrasing existing samples from the minority classes." \
+            " Examples are:")
+        st.latex(r"""
+            \begin{array}{|c|l|}
+                \hline
+                \small \textit{Original} & \small \textit{The app keeps crashing when I try to open it.} \\
+                \hline
+                \small \text{Paraphrase 1} & \small \text{The app crashes every time I attempt to open it.} \\
+                \small \text{Paraphrase 2} & \small \text{Whenever I try to launch the app, it shuts down unexpectedly.} \\
+                \hline
+                \small \textit{Original} & \small \textit{I can't log into my account with the correct password.} \\
+                \hline
+                \small \text{Paraphrase 1} & \small \text{I'm unable to access my account even though I'm using the correct password.} \\
+                \small \text{Paraphrase 2} & \small \text{Despite entering the right password, I can't sign into my account.} \\
+                \hline
+            \end{array}
+        """)
+
+        st.markdown("Class filtering and balancing results:")
+        st.image("figures/text_aug_dist.png", caption="Distribution of original, dropped, and augmented samples", use_container_width=True)
+
+        st.markdown("---")
+        st.markdown("#### 📌 Examples of Preprocessing Results")
+        st.write("Click the button to generate randomly preprocessing results:")
+        if st.button("Click Me"):
+            st.markdown("**Input Text:**")
+            idx = np.random.randint(0, ori_dataset_backend.shape[0])
+            st.write(f"{ori_dataset_backend.loc[idx,'text']}")
+            st.markdown(f"**Class: {ori_dataset_backend.loc[idx,'prdtypecode']}**")
+            st.markdown("**Preprocessed Text:**")
+            if idx in preprocessed_dataset.index:
+                st.write(f"{preprocessed_dataset.loc[idx,'text']}")
+            else:
+                st.write("N/A (*This data sample is dropped or filtered during the preprocessing process*)")
 
     # Image Data Preprocessing
     with tab2: 
