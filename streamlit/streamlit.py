@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from PIL import Image
 
 st.title("Rakuten: multi-modal product classification project")
 st.sidebar.title("Table of contents")
@@ -13,13 +14,45 @@ original_dataset = pd.read_csv('../data/X_train.csv', index_col=0)
 y_ori = pd.read_csv('../data/Y_train.csv', index_col=0)
 original_dataset = pd.concat([original_dataset, y_ori], axis=1)
 
+labels = pd.read_csv('data/class_category.csv', delimiter=';', index_col=None)
+labels.columns = ["Product Type Code", "Product Category"]
+labels.index = [''] * len(labels) # set the index to an empty string to hide row index
+
+img_class_dist = Image.open("figures/class_dist.jpg").convert("RGB")
+width, height = img_class_dist.size
+img_class_dist = img_class_dist.crop((0, 60, width, height))
+
 if page == pages[0]:
     st.write("### Introduction of the project")
 
 if page == pages[1]:
-    st.write("### Presentation of data")
-    st.write("We first explore the data available for our project, here is an short overview of first five rows of data:")
+    st.write("### Presentation of Data")
+    st.markdown("#### 📸 Overview of Original Data")
+    st.write("The original data included four columns as explanatory variables (i.e., 'designation', 'description', 'productid' and 'imageid') and one target column named 'prdtypecode'." \
+        "\nBoth 'designation' and 'description' are going to be merged as the textual data, while 'productid' and 'imageid' are used for extracting image file for the product."
+    )
     st.dataframe(original_dataset.head())
+
+    st.markdown("---")
+    st.markdown("#### 🔍 Class Categories")
+    st.write("There are a total of 84,915 data samples available, with 27 classes representing different product categories to be classified.")
+    with st.expander("Detailed Class Categories"):
+        st.table(labels)
+    st.write("There are a priori some specific classes that are frequently confused even by human. Examples are the following:")
+    st.markdown("""
+        - Class 10 (used book) and class 2705 (new book)
+        - Class 1180 (board games), class 1280 (chidren's toys) and class 1281 (social games)
+        - Class 40 (video game), class 60 (console game) and class 2905 (PC game)
+        """
+    )
+    st.markdown("---")
+    st.markdown("#### 📊 Class Distribution")
+    st.write("The target classes of the entire data samples are imbalanced, with the majority class 2583 (poolside items) containing over 10k samples, while the minority classes represent" \
+        "only about 1% of the entire data.")
+    st.image(img_class_dist, caption="Distribution of Data Samples across Target Classes", use_container_width=True)
+
+    st.markdown("---")
+    st.markdown("#### 📌 Data Examples")
 
 if page == pages[2]:
     st.write("### Preprocessing of data")
