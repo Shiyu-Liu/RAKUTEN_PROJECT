@@ -354,7 +354,7 @@ if page == pages[3]:
         st.markdown("---")
         st.markdown("#### 💡 DistilBERT LLM")
         st.write("DistilBERT is a virant of the original BERT large pretrained language model. We used the distilbert-based-uncase" \
-            " model and fine-tuned it on our dataset with 6 epochs. We did a **70%/15%/15%** stratified train-eval-test split on our original dataset.")
+            " model and fine-tuned it on our dataset with 6 epochs. We did a **70%/15%/15%** stratified train-validation-test split on our original dataset.")
         col1, _ = st.columns([3,2])
         with col1:
             with st.expander("🛠️ Training Configuration"):
@@ -385,12 +385,19 @@ if page == pages[3]:
 
         st.markdown("---")
         st.markdown("#### 🏆 DistilBERT Model Performance")
-        st.write("After 6 epochs of training, the model performance evaluated on the evaluation set has achieved:")
+        st.write("After 6 epochs of training, the model performance evaluated on the **validation set** has achieved:")
         col1, col2, _ = st.columns([1,1,3])
         with col1:
             st.metric(label="**Accuracy**", value="84.5%")
         with col2:
             st.metric(label="**Weighted F1-score**", value="84.4%")
+        st.write("Model performance evaluated on the **test set** has achieved:")
+        col1, col2, _ = st.columns([1,1,3])
+        with col1:
+            st.metric(label="**Accuracy**", value="82.9%")
+        with col2:
+            st.metric(label="**Weighted F1-score**", value="82.9%")
+
         col1, _ = st.columns([3,2])
         with col1:
             with st.expander("🔍 Show Confusion Matrix"):
