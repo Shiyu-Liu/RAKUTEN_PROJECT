@@ -10,9 +10,22 @@ st.set_page_config(layout="wide")
 image_width = 800
 
 st.title("Rakuten: multi-modal product classification project")
+st.sidebar.image("figures/data_scientest.png")
 st.sidebar.title("Table of contents")
 pages=["Introduction", "Data Exploration", "Data Preprocessing", "Modeling", "Conclusion", "DEMO app"]
 page=st.sidebar.radio("Go to", pages)
+st.sidebar.markdown("<div style='height:200px;'></div>", unsafe_allow_html=True) # Spacer to push footer down
+st.sidebar.markdown(
+    "<div style='text-align:left; color:gray; font-size:16px;'>"
+    "Contributors:<br>"
+    "<b>Deniz AYDIN</b><br>"
+    "<b>Shiyu LIU</b><br><br>"
+    "Mentor:<br>"
+    "<b>M. Yaniv BENICHOU</b><br><br>"
+    "June 2025"
+    "</div>",
+    unsafe_allow_html=True
+)
 
 original_dataset = pd.read_csv('../data/X_train.csv', index_col=0)
 y_ori = pd.read_csv('../data/Y_train.csv', index_col=0)
