@@ -334,13 +334,15 @@ if page == pages[3]:
                 st.write("**XGBoost**")
                 st.code("XGBClassifier(n_estimators=200, max_depth=None)")
 
-        st.dataframe({
-            "Model": ["SVM", "RF", "XGBoost"],
-            "Train Acc": [0.815, 0.954, 0.852],
-            "Train F1-score": [0.814, 0.953, 0.857],
-            "Val Acc": [ 0.719, 0.713, 0.713],
-            "Val F1-score": [0.720, 0.716, 0.721]
-        })
+        col1, _ = st.columns([3,2])
+        with col1:
+            st.dataframe({
+                "Model": ["SVM", "RF", "XGBoost"],
+                "Train Acc": [0.815, 0.954, 0.852],
+                "Train F1-score": [0.814, 0.953, 0.857],
+                "Val Acc": [ 0.719, 0.713, 0.713],
+                "Val F1-score": [0.720, 0.716, 0.721]
+            })
         st.write("*Note that F1-score is computed using macro averaging method.*")
         st.write("Based on the results, we retained **XGBoost** as the best model among these classical ML algorithms.")
         col1, _ = st.columns([3,2])
@@ -421,19 +423,21 @@ if page == pages[3]:
             "This setup helped generalize better and control overfitting."
         )
 
-        st.code(
-            "models.Sequential([\n"
-            "    base_model,\n"
-            "    layers.GlobalAveragePooling2D(),\n"
-            "    layers.BatchNormalization(),\n"
-            "    layers.Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.01)),\n"
-            "    layers.Dropout(0.5),\n"
-            "    layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.01)),\n"
-            "    layers.Dropout(0.3),\n"
-            "    layers.Dense(num_classes, activation='softmax')\n"
-            "])",
-            language="python"
-        )
+        col1, _ = st.columns([3,2])
+        with col1:
+            st.code(
+                "models.Sequential([\n"
+                "    base_model,\n"
+                "    layers.GlobalAveragePooling2D(),\n"
+                "    layers.BatchNormalization(),\n"
+                "    layers.Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.01)),\n"
+                "    layers.Dropout(0.5),\n"
+                "    layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.01)),\n"
+                "    layers.Dropout(0.3),\n"
+                "    layers.Dense(num_classes, activation='softmax')\n"
+                "])",
+                language="python"
+            )
 
         st.markdown("---")
         st.markdown("#### ⚙️ Training Configuration")
@@ -467,12 +471,14 @@ if page == pages[3]:
             "While `efficientnetb0_l5lr` had the highest validation accuracy, its higher overfitting led to selecting `efficientnetb0_l5` as the final model due to better generalization."
         )
 
-        st.dataframe({
-            "Model": ["efficientnetb0_l5", "efficientnetb0_l5lr", "convnexttiny_l5lr", "densenet_l5"],
-            "Train Acc": [0.63, 0.66, 0.58, 0.62],
-            "Val Acc": [0.61, 0.61, 0.58, 0.56],
-            "Gen. Gap": [0.027, 0.051, -0.004, 0.062]
-        })
+        col1, _ = st.columns([3,2])
+        with col1:
+            st.dataframe({
+                "Model": ["efficientnetb0_l5", "efficientnetb0_l5lr", "convnexttiny_l5lr", "densenet_l5"],
+                "Train Acc": [0.63, 0.66, 0.58, 0.62],
+                "Val Acc": [0.61, 0.61, 0.58, 0.56],
+                "Gen. Gap": [0.027, 0.051, -0.004, 0.062]
+            })
 
         st.markdown("---")
         st.markdown("#### 🏆 Best Model Performance")
