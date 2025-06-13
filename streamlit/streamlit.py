@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from PIL import Image
 
+st.set_page_config(layout="wide")
+
 st.title("Rakuten: multi-modal product classification project")
 st.sidebar.title("Table of contents")
-pages=["Introduction", "Data Exploration", "Data Preprocessing", "Modeling", "DEMO app"]
+pages=["Introduction", "Data Exploration", "Data Preprocessing", "Modeling", "Conclusion", "DEMO app"]
 page=st.sidebar.radio("Go to", pages)
 
 original_dataset = pd.read_csv('../data/X_train.csv', index_col=0)
@@ -449,7 +451,31 @@ if page == pages[3]:
             "- **Video game, tech accessory (Class 40)** vs **PC game (Class 2905)**: similar design, overlapping concepts."
         )
 
+if page == pages[4]:
+    st.markdown("#### ✅ Project Summary")
+
+    st.write(
+        "The project delivered a **multi-modal product classification model** that combined text and image data to improve accuracy. "
+        "Separate text and image models were trained using traditional ML, deep learning, and large pre-trained models. "
+        "A soft voting fusion combined their predictions, achieving **81% accuracy** and **0.83 macro F1-score**—demonstrating the power of multi-modal integration."
+    )
+
+    st.markdown("---")
+    st.markdown("#### 🚀 Limitations and Challenges")
+
+    st.write(
+        "- **Test set limitations:** The final test set was imbalanced because creating a clean, unified holdout set wasn’t feasible due to team structure and early project coordination gaps.\n"
+        "- **Resource constraints:** Computational limits and tight deadlines restricted experimentation with larger models and deeper hyperparameter tuning."
+    )
+
+    with st.expander("💡 Suggested improvements"):
+        st.write(
+            "Future work should:\n"
+            "- Prepare a shared, held-out test set during initial preprocessing.\n"
+            "- Allocate more time for experimenting with complex architectures and fine-tuning models.\n"
+            "- Design a coordinated validation pipeline from the start to ensure consistent evaluation."
+        )
     
 
-if page == pages[4]:
+if page == pages[5]:
     st.write("### DEMO app: try out with your own input")
