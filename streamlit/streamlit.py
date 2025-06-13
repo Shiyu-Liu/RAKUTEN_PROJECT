@@ -7,6 +7,7 @@ import seaborn as sns
 from PIL import Image
 
 st.set_page_config(layout="wide")
+image_width = 800
 
 st.title("Rakuten: multi-modal product classification project")
 st.sidebar.title("Table of contents")
@@ -81,12 +82,12 @@ if page == pages[1]:
     st.markdown("#### 📊 Class Distribution")
     st.write("The target classes of the entire data samples are imbalanced, with the majority class 2583 (poolside items) containing over 10k samples, while the minority classes represent" \
         " only about 1% of the entire data.")
-    st.image(img_class_dist, caption="Distribution of Data Samples across Target Classes", use_container_width=True)
+    st.image(img_class_dist, caption="Distribution of Data Samples across Target Classes", width=image_width)
 
     st.markdown("---")
     st.markdown("#### 📌 Data Examples")
     st.markdown("🔺 **Class 10 (used book) V.S. Class 2705 (new book)**")
-    col1, col2 = st.columns(2)
+    _, col1, col2, _, _ = st.columns(5)
     with col1:
         with st.container():
             st.markdown(
@@ -107,7 +108,7 @@ if page == pages[1]:
                 st.markdown(f"**Text:** {ori_dataset_backend.loc[82160,'text']}")
     st.markdown("\n\n")
     st.markdown("🔺 **Class 1180 (board games) V.S. Class 1280 (children's toy) V.S. Class 1281 (social games)**")
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, _ = st.columns(4)
     with col1:
         with st.container():
             st.markdown(
@@ -137,7 +138,7 @@ if page == pages[1]:
                 st.markdown(f"**Text:** {ori_dataset_backend.loc[4467,'text']}")
     st.markdown("\n\n")
     st.markdown("🔺 **Class 40 (video game) V.S. Class 2905 (PC game)**")
-    col1, col2 = st.columns(2)
+    _, col1, col2, _, _ = st.columns(5)
     with col1:
         with st.container():
             st.markdown(
@@ -190,13 +191,13 @@ if page == pages[2]:
             """
         )
         with st.expander("Distribution of Word Counts"):
-            st.image("figures/word_count_dist.jpg", caption="Distribution of word counts across target classes", use_container_width=True)
+            st.image("figures/word_count_dist.jpg", caption="Distribution of word counts across target classes", width=image_width)
 
         st.markdown("---")
         st.markdown("#### 🏷️ Text Translation & Class Balancing")
         st.write("We leveraged the OpenAI-API and used ChatGPT-4.1-nano model to translate all the text into a unified language. The target language is **English**.")
         with st.expander("Distribution of Text Languages"):
-            st.image("figures/language_dist.jpg", caption="Distribution of data samples across target classes and languages", use_container_width=True)
+            st.image("figures/language_dist.jpg", caption="Distribution of data samples across target classes and languages", width=image_width)
 
         st.write("The ChatGPT-4.1-nano model is also used to generate dummy text by paraphrasing existing samples from the minority classes." \
             " Examples are:")
@@ -218,7 +219,7 @@ if page == pages[2]:
 
         st.markdown("---")
         st.markdown("#### 🏁 Class Filtering and Balancing Results:")
-        st.image("figures/text_aug_dist.png", caption="Distribution of original, dropped, and augmented samples", use_container_width=True)
+        st.image("figures/text_aug_dist.png", caption="Distribution of original, dropped, and augmented samples", width=image_width)
 
         st.markdown("---")
         st.markdown("#### 📌 Examples of Preprocessing Results")
@@ -263,8 +264,7 @@ if page == pages[2]:
         "- Used **LabelEncoder** and did an **80/20 stratified train-test split**.\n"
         "- Balanced classes by undersampling or generating augmented samples."
         )
-
-        st.image("figures/img_augm_dist.png", caption="Distribution of original, dropped, and augmented samples", use_container_width=True)
+        st.image("figures/img_augm_dist.png", caption="Distribution of original, dropped, and augmented samples", width=image_width)
 
         st.markdown("---")
         st.markdown("#### ⚙️ Dataset Assembly and tf.data Pipeline")
@@ -316,7 +316,7 @@ if page == pages[3]:
         st.write("*Note that F1-score is computed using macro averaging method.*")
         st.write("Based on the results, we retained **XGBoost** as the best model among these classical ML algorithms.")
         with st.expander("🔍 Show Confusion Matrix"):
-            st.image("figures/text_basic_cm.png", caption="Confusion Matrix of the XGBoost Model", use_container_width=True)
+            st.image("figures/text_basic_cm.png", caption="Confusion Matrix of the XGBoost Model", width=image_width)
 
         st.markdown("---")
         st.markdown("#### 💡 DistilBERT LLM")
@@ -339,18 +339,20 @@ if page == pages[3]:
         fig.add_trace(go.Scatter(x=distilbert_results['epoch'], y=distilbert_results['eval_arr'], mode='lines+markers', name='Eval Accuracy'))
         fig.add_trace(go.Scatter(x=distilbert_results['epoch'], y=distilbert_results['eval_f1'], mode='lines+markers', name='Eval F1-score'))
         fig.update_layout(
+            width=800,
+            height=500,
             title='Train and Evaluation Metrics',
             xaxis_title='Epoch',
             yaxis_title='Scores',
             font=dict(size=14)
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=False)
 
         st.markdown("---")
         st.markdown("#### 🏆 DistilBERT Model Performance")
         st.write("After 6 epochs of training, our model has achieved a **weighted F1-score of 84.4%** with **overall accuracy of 84.5%** on the evaluation set.")
         with st.expander("🔍 Show Confusion Matrix"):
-            st.image("figures/text_cm.png", caption="Confusion Matrix of the DistilBERT Model", use_container_width=True)
+            st.image("figures/text_cm.png", caption="Confusion Matrix of the DistilBERT Model", width=image_width)
 
         st.markdown("---")
         st.markdown("#### ❌ Common Misclassifications")
@@ -440,7 +442,7 @@ if page == pages[3]:
         )
 
         with st.expander("🔍 Show Confusion Matrix"):
-            st.image("figures/img_cm.png", caption="Confusion Matrix of the Best Model", use_container_width=True)
+            st.image("figures/img_cm.png", caption="Confusion Matrix of the Best Model", width=image_width)
 
         st.markdown("---")
         st.markdown("#### ❌ Common Misclassifications")
