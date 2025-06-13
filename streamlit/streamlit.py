@@ -211,7 +211,8 @@ if page == pages[2]:
             \end{array}
         """)
 
-        st.markdown("Class filtering and balancing results:")
+        st.markdown("---")
+        st.markdown("#### 🏁 Class Filtering and Balancing Results:")
         st.image("figures/text_aug_dist.png", caption="Distribution of original, dropped, and augmented samples", use_container_width=True)
 
         st.markdown("---")
