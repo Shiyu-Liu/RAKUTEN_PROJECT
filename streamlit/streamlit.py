@@ -382,7 +382,12 @@ if page == pages[3]:
 
         st.markdown("---")
         st.markdown("#### 🏆 DistilBERT Model Performance")
-        st.write("After 6 epochs of training, our model has achieved a **weighted F1-score of 84.4%** with **overall accuracy of 84.5%** on the evaluation set.")
+        st.write("After 6 epochs of training, the model performance evaluated on the evaluation set has achieved:")
+        col1, col2, _ = st.columns([1,1,3])
+        with col1:
+            st.metric(label="**Accuracy**", value="84.5%")
+        with col2:
+            st.metric(label="**Weighted F1-score**", value="84.4%")
         col1, _ = st.columns([3,2])
         with col1:
             with st.expander("🔍 Show Confusion Matrix"):
