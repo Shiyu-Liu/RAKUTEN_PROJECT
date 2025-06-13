@@ -51,6 +51,10 @@ rakuten_logo = Image.open("figures/rakuten.jpg").convert("RGB")
 width, height = rakuten_logo.size
 rakuten_logo = rakuten_logo.crop((20, 100, width, height-120))
 
+word_cloud_img = Image.open("figures/word_cloud.png").convert("RGB")
+width, height = word_cloud_img.size
+word_cloud_img = word_cloud_img.crop((100, 30, width-100, height-60))
+
 if page == pages[0]:
     st.image(rakuten_logo, width=int(image_width*0.5))
     st.write("### Introduction of the project")
@@ -246,6 +250,7 @@ if page == pages[2]:
         st.markdown("---")
         st.markdown("#### 🏁 Class Filtering and Balancing Results:")
         st.image("figures/text_aug_dist.png", caption="Distribution of original, dropped, and augmented samples", width=image_width)
+        st.image(word_cloud_img, caption="Word cloud from the preprocessed textual data", width=image_width)
 
         st.markdown("---")
         st.markdown("#### 📌 Examples of Preprocessing Results")
