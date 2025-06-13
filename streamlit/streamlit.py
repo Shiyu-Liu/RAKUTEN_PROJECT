@@ -310,7 +310,7 @@ if page == pages[2]:
 
 if page == pages[3]:
     st.write("### Modeling")
-    tab1, tab2 = st.tabs(["Textual Model", "Image Model"])
+    tab1, tab2, tab3 = st.tabs(["Textual Model", "Image Model", "Model Fusion"])
 
     # Text Modeling
     with tab1:
@@ -509,6 +509,64 @@ if page == pages[3]:
             "- **Used book (Class 10)** vs **New book (Class 2705)**: difficult to distinguish from covers alone.\n"
             "- **Video game, tech accessory (Class 40)** vs **PC game (Class 2905)**: similar design, overlapping concepts."
         )
+
+    with tab3:
+        st.markdown("#### 🪜 Fusion Strategy")
+        st.write("We used a **soft voting strategy** to combine the probabilities of predicted class from the text and image-based model to make final prediction using the multi-modal information.")
+        st.write("According to performance of each unimodal models, we chose the weights for averaging the predicted probabilities as follows."
+            " We also tested with the configuration that equally weights two models for fusion."
+        )
+        col1, _ = st.columns([3,2])
+        with col1:
+            st.code("WEIGHTS = [w_text, w_image] = [0.6, 0.4]", language="python")
+
+        st.write("We created a new test set for final evaluation, which excludes any samples that had been previously used for training either the text or image model.")
+        col1, _ = st.columns([3,2])
+        with col1:
+            with st.expander("Test Set Distribution"):
+                st.image("figures/test_set_dist.png", caption="Data distribution of test set for final evaluation", use_container_width=True)
+
+        st.markdown("---")
+        st.markdown("#### 📊 Multi-Modal Model Performance")
+        st.write("To make a fair comparison, the individual text and image-based models were also evaluated on the test set, and their performance is compared with that of the fused multi-modal model.")
+        col1, _, col3, _, _ = st.columns(5)
+        with col1:
+            st.markdown("🔸 **Image Model**:")
+        with col3:
+            st.markdown("🔸 **Text Model**:")
+
+        col1, col2, col3, col4, _ = st.columns(5)
+        with col1:
+            st.metric(label="**Accuracy**", value="58.1%")
+        with col2:
+            st.metric(label="**Weighted F1-score**", value="57.5%")
+        with col3:
+            st.metric(label="**Accuracy**", value="80.0%", delta="+21.9%")
+            st.write("*Delta compared with Image Model*")
+        with col4:
+            st.metric(label="**Weighted F1-score**", value="79.9%", delta="+22.4%")
+
+        col1, col2, _, = st.columns([2,2,1])
+        with col1:
+            st.markdown("🔸 **Fused Multi-Modal Model** (weights of [0.6, 0.4]):")
+        with col2:
+            st.markdown("🔸 **Fused Multi-Modal Model** (equal weights):")
+        col1, col2, col3, col4, _ = st.columns(5)
+        with col1:
+            st.metric(label="**Accuracy**", value="81.3%", delta="+1.3%")
+            st.write("*Delta compared with Text Model*")
+        with col2:
+            st.metric(label="**Weighted F1-score**", value="81.2%", delta="+1.3%")
+        with col3:
+            st.metric(label="**Accuracy**", value="81.8%", delta="+1.8%")
+            st.write("*Delta compared with Text Model*")
+        with col4:
+            st.metric(label="**Weighted F1-score**", value="81.7%", delta="+1.8%")
+
+        col1, _ = st.columns([4,2])
+        with col1:
+            with st.expander("F1-Score Comparison Details"):
+                st.image("figures/f1_score_comparison.png", caption="Comparison of F1-scores for image, text and fused multi-modal model.", use_container_width=True)
 
 if page == pages[4]:
     st.markdown("#### ✅ Project Summary")
