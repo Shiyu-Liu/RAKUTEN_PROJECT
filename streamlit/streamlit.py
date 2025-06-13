@@ -47,7 +47,12 @@ img_class_dist = img_class_dist.crop((0, 60, width, height))
 
 distilbert_results = pd.read_csv('data/distilbert_results.csv')
 
+rakuten_logo = Image.open("figures/rakuten.jpg").convert("RGB")
+width, height = rakuten_logo.size
+rakuten_logo = rakuten_logo.crop((20, 100, width, height-120))
+
 if page == pages[0]:
+    st.image(rakuten_logo, width=int(image_width*0.5))
     st.write("### Introduction of the project")
     st.markdown("#### 🛍️ Business Problem")
 
@@ -68,7 +73,7 @@ if page == pages[0]:
     )
 
     st.markdown(
-        "> The dataset was sourced from Rakuten Institute of Technology's Challenge Data platform and used for research purposes."
+        "> The dataset was sourced from Rakuten Institute of Technology's Challenge Data platform and used for research purposes. https://challengedata.ens.fr/challenges/35"
     )
 
 if page == pages[1]:
