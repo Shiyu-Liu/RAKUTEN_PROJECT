@@ -69,8 +69,10 @@ if page == pages[1]:
     st.markdown("---")
     st.markdown("#### 🔍 Class Categories")
     st.write("There are a total of 84,915 data samples available, with 27 classes representing different product categories to be classified.")
-    with st.expander("Detailed Class Categories"):
-        st.table(labels)
+    col1, _ = st.columns([3,2])
+    with col1:
+        with st.expander("Detailed Class Categories"):
+            st.table(labels)
     st.write("There are a priori some specific classes that are frequently confused even by human. Examples are the following:")
     st.markdown("""
         - Class 10 (used book) and class 2705 (new book)
@@ -190,14 +192,18 @@ if page == pages[2]:
             - **Sample size of 2500** per class.
             """
         )
-        with st.expander("Distribution of Word Counts"):
-            st.image("figures/word_count_dist.jpg", caption="Distribution of word counts across target classes", width=image_width)
+        col1, _ = st.columns([3,2])
+        with col1:
+            with st.expander("Distribution of Word Counts"):
+                st.image("figures/word_count_dist.jpg", caption="Distribution of word counts across target classes", width=image_width)
 
         st.markdown("---")
         st.markdown("#### 🏷️ Text Translation & Class Balancing")
         st.write("We leveraged the OpenAI-API and used ChatGPT-4.1-nano model to translate all the text into a unified language. The target language is **English**.")
-        with st.expander("Distribution of Text Languages"):
-            st.image("figures/language_dist.jpg", caption="Distribution of data samples across target classes and languages", width=image_width)
+        col1, _ = st.columns([3,2])
+        with col1:
+            with st.expander("Distribution of Text Languages"):
+                st.image("figures/language_dist.jpg", caption="Distribution of data samples across target classes and languages", width=image_width)
 
         st.write("The ChatGPT-4.1-nano model is also used to generate dummy text by paraphrasing existing samples from the minority classes." \
             " Examples are:")
@@ -300,13 +306,15 @@ if page == pages[3]:
         st.markdown("#### ✏️ Classical ML Models")
         st.write("For training the classical ML models, we first applied the TF-IDF vectorizer to the original text, and then used a " \
             "grid search-based approach to find the best hyperparameters retained in the model.")
-        with st.expander("🛠️ Model Hyperparameter Details"):
-            st.write("**SVM**:")
-            st.code("SVC(C=1, loss='squared_hinge', kernel='linear')")
-            st.write("**RF**")
-            st.code("RandomForestClassifier(n_estimators=200, max_depth=None)")
-            st.write("**XGBoost**")
-            st.code("XGBClassifier(n_estimators=200, max_depth=None)")
+        col1, _ = st.columns([3,2])
+        with col1:
+            with st.expander("🛠️ Model Hyperparameter Details"):
+                st.write("**SVM**:")
+                st.code("SVC(C=1, loss='squared_hinge', kernel='linear')")
+                st.write("**RF**")
+                st.code("RandomForestClassifier(n_estimators=200, max_depth=None)")
+                st.write("**XGBoost**")
+                st.code("XGBClassifier(n_estimators=200, max_depth=None)")
 
         st.dataframe({
             "Model": ["SVM", "RF", "XGBoost"],
@@ -317,24 +325,28 @@ if page == pages[3]:
         })
         st.write("*Note that F1-score is computed using macro averaging method.*")
         st.write("Based on the results, we retained **XGBoost** as the best model among these classical ML algorithms.")
-        with st.expander("🔍 Show Confusion Matrix"):
-            st.image("figures/text_basic_cm.png", caption="Confusion Matrix of the XGBoost Model", width=image_width)
+        col1, _ = st.columns([3,2])
+        with col1:
+            with st.expander("🔍 Show Confusion Matrix"):
+                st.image("figures/text_basic_cm.png", caption="Confusion Matrix of the XGBoost Model", width=image_width)
 
         st.markdown("---")
         st.markdown("#### 💡 DistilBERT LLM")
         st.write("DistilBERT is a virant of the original BERT large pretrained language model. We used the distilbert-based-uncase" \
             " model and fine-tuned it on our dataset with 6 epochs. We did a **70%/15%/15%** stratified train-eval-test split on our original dataset.")
-        with st.expander("🛠️ Training Configuration"):
-            st.code("training_args = TrainingArguments(\n"
-                    "   learning_rate=2e-5,\n"
-                    "   per_device_train_batch_size=16,\n"
-                    "   per_device_eval_batch_size=64,\n"
-                    "   num_train_epochs=6,\n"
-                    "   weight_decay=0.01,\n"
-                    "   load_best_model_at_end=True,\n"
-                ")",
-                language="python"
-            )
+        col1, _ = st.columns([3,2])
+        with col1:
+            with st.expander("🛠️ Training Configuration"):
+                st.code("training_args = TrainingArguments(\n"
+                        "   learning_rate=2e-5,\n"
+                        "   per_device_train_batch_size=16,\n"
+                        "   per_device_eval_batch_size=64,\n"
+                        "   num_train_epochs=6,\n"
+                        "   weight_decay=0.01,\n"
+                        "   load_best_model_at_end=True,\n"
+                    ")",
+                    language="python"
+                )
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=distilbert_results['epoch'], y=distilbert_results['train_acc'], mode='lines+markers', name='Train Accuracy'))
         fig.add_trace(go.Scatter(x=distilbert_results['epoch'], y=distilbert_results['train_f1'], mode='lines+markers', name='Train F1-score'))
@@ -353,8 +365,10 @@ if page == pages[3]:
         st.markdown("---")
         st.markdown("#### 🏆 DistilBERT Model Performance")
         st.write("After 6 epochs of training, our model has achieved a **weighted F1-score of 84.4%** with **overall accuracy of 84.5%** on the evaluation set.")
-        with st.expander("🔍 Show Confusion Matrix"):
-            st.image("figures/text_cm.png", caption="Confusion Matrix of the DistilBERT Model", width=image_width)
+        col1, _ = st.columns([3,2])
+        with col1:
+            with st.expander("🔍 Show Confusion Matrix"):
+                st.image("figures/text_cm.png", caption="Confusion Matrix of the DistilBERT Model", width=image_width)
 
         st.markdown("---")
         st.markdown("#### ❌ Common Misclassifications")
@@ -407,17 +421,19 @@ if page == pages[3]:
             "- **Sparse Categorical Accuracy** for evaluation\n"
             "- **EarlyStopping**, **ModelCheckpoint**, and **ReduceLROnPlateau** callbacks for efficient training"
         )
-        with st.expander("🛠️ Callback Configuration Details"):
-            st.markdown("**EarlyStopping**")
-            st.code(
-                "early_stop = EarlyStopping(\n"
-                "    monitor='val_loss',\n"
-                "    patience=3,\n"
-                "    min_delta=0.02,\n"
-                "    restore_best_weights=True\n"
-                ")",
-                language="python"
-            )
+        col1, _ = st.columns([3,2])
+        with col1:
+            with st.expander("🛠️ Callback Configuration Details"):
+                st.markdown("**EarlyStopping**")
+                st.code(
+                    "early_stop = EarlyStopping(\n"
+                    "    monitor='val_loss',\n"
+                    "    patience=3,\n"
+                    "    min_delta=0.02,\n"
+                    "    restore_best_weights=True\n"
+                    ")",
+                    language="python"
+                )
 
 
         st.markdown("---")
@@ -443,8 +459,10 @@ if page == pages[3]:
             "Precision and recall varied across classes, reflecting class difficulty and visual ambiguity."
         )
 
-        with st.expander("🔍 Show Confusion Matrix"):
-            st.image("figures/img_cm.png", caption="Confusion Matrix of the Best Model", width=image_width)
+        col1, _ = st.columns([3,2])
+        with col1:
+            with st.expander("🔍 Show Confusion Matrix"):
+                st.image("figures/img_cm.png", caption="Confusion Matrix of the Best Model", width=image_width)
 
         st.markdown("---")
         st.markdown("#### ❌ Common Misclassifications")
@@ -472,13 +490,15 @@ if page == pages[4]:
         "- **Resource constraints:** Computational limits and tight deadlines restricted experimentation with larger models and deeper hyperparameter tuning."
     )
 
-    with st.expander("💡 Suggested improvements"):
-        st.write(
-            "Future work should:\n"
-            "- Prepare a shared, held-out test set during initial preprocessing.\n"
-            "- Allocate more time for experimenting with complex architectures and fine-tuning models.\n"
-            "- Design a coordinated validation pipeline from the start to ensure consistent evaluation."
-        )
+    col1, _ = st.columns([3,2])
+    with col1:
+        with st.expander("💡 Suggested improvements"):
+            st.write(
+                "Future work should:\n"
+                "- Prepare a shared, held-out test set during initial preprocessing.\n"
+                "- Allocate more time for experimenting with complex architectures and fine-tuning models.\n"
+                "- Design a coordinated validation pipeline from the start to ensure consistent evaluation."
+            )
     
 
 if page == pages[5]:
