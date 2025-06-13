@@ -30,6 +30,27 @@ img_class_dist = img_class_dist.crop((0, 60, width, height))
 
 if page == pages[0]:
     st.write("### Introduction of the project")
+    st.markdown("#### 🛍️ Business Problem")
+
+    st.write(
+        "Rakuten France manages a massive and growing product catalog from various sellers. "
+        "Accurate categorization within their product hierarchy is vital for search, recommendations, and inventory management. "
+        "Current categorization relies heavily on seller metadata, which is often inconsistent—leading to ambiguity and costly manual corrections."
+    )
+
+    st.markdown("---")
+    st.markdown("#### 🎯 Objectives and Goals")
+
+    st.write(
+        "The project aimed to build a **multimodal classification model** predicting product type codes using both text and image inputs. Key goals included:\n"
+        "- Developing separate **text** and **image** models to assess each modality's contribution.\n"
+        "- Combining them using **late fusion** for a stronger multimodal system.\n"
+        "- Evaluating and comparing unimodal vs multimodal model performance."
+    )
+
+    st.markdown(
+        "> The dataset was sourced from Rakuten Institute of Technology's Challenge Data platform and used for research purposes."
+    )
 
 if page == pages[1]:
     st.write("### Presentation of Data")
