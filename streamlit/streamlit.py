@@ -201,21 +201,23 @@ if page == pages[2]:
 
         st.write("The ChatGPT-4.1-nano model is also used to generate dummy text by paraphrasing existing samples from the minority classes." \
             " Examples are:")
-        st.latex(r"""
-            \begin{array}{|c|l|}
-                \hline
-                \small \textit{Original} & \small \textit{The app keeps crashing when I try to open it.} \\
-                \hline
-                \small \text{Paraphrase 1} & \small \text{The app crashes every time I attempt to open it.} \\
-                \small \text{Paraphrase 2} & \small \text{Whenever I try to launch the app, it shuts down unexpectedly.} \\
-                \hline
-                \small \textit{Original} & \small \textit{I can't log into my account with the correct password.} \\
-                \hline
-                \small \text{Paraphrase 1} & \small \text{I'm unable to access my account even though I'm using the correct password.} \\
-                \small \text{Paraphrase 2} & \small \text{Despite entering the right password, I can't sign into my account.} \\
-                \hline
-            \end{array}
-        """)
+        left, _ = st.columns([1,3])
+        with left:
+            st.latex(r"""
+                \begin{array}{|c|l|}
+                    \hline
+                    \small \textit{Original} & \small \textit{The app keeps crashing when I try to open it.} \\
+                    \hline
+                    \small \text{Paraphrase 1} & \small \text{The app crashes every time I attempt to open it.} \\
+                    \small \text{Paraphrase 2} & \small \text{Whenever I try to launch the app, it shuts down unexpectedly.} \\
+                    \hline
+                    \small \textit{Original} & \small \textit{I can't log into my account with the correct password.} \\
+                    \hline
+                    \small \text{Paraphrase 1} & \small \text{I'm unable to access my account even though I'm using the correct password.} \\
+                    \small \text{Paraphrase 2} & \small \text{Despite entering the right password, I can't sign into my account.} \\
+                    \hline
+                \end{array}
+            """)
 
         st.markdown("---")
         st.markdown("#### 🏁 Class Filtering and Balancing Results:")
