@@ -278,7 +278,7 @@ if page == pages[2]:
 
 if page == pages[3]:
     st.write("### Modeling")
-    tab1, tab2 = st.tabs(["Textual Data", "Image Data"])
+    tab1, tab2 = st.tabs(["Textual Model", "Image Model"])
 
     # Image Modeling
     with tab2: 
