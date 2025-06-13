@@ -18,7 +18,7 @@ IMAGE_RATIO = "../data/x_train_with_ratios.csv"
 IMAGE_DIR = "../data/images/image_train_zoomed"
 IMAGE_TEST_SET = "../data/image_data_val.csv"
 TEST_SET_OUTPUT = "../data/test_set_final_evaluation.csv"
-OUTPUT_DIR = "results/fusion_model"
+OUTPUT_DIR_ORI = "results/fusion_model"
 TEXT_PROB_OUTPUT = "text_pred_prob.csv"
 IMG_PROB_OUTPUT = "image_pred_prob.csv"
 
@@ -30,7 +30,8 @@ missing_images = {'image_1142089742_product_884747735.jpg',
 BEST_IMAGE_MODEL = "results/efficientnetb0_b128l5_best_model.keras"
 BEST_TEXT_MODEL = "results/distilbert_best_model/saved_model"
 
-WEIGHTS = [3, 2]  # weights of [textual, image] model
+WEIGHTS = [2, 2]  # weights of [textual, image] model
+OUTPUT_DIR = "results/fusion_model_"+str(WEIGHTS[0])+"_"+str(WEIGHTS[1])
 
 def prepare_test_set_new():
     text_data = pd.read_csv(TEXT_FILE, delimiter=';', index_col=0)
@@ -136,16 +137,28 @@ def main():
     # predict by text model
     text_prob_file = os.path.join(OUTPUT_DIR, TEXT_PROB_OUTPUT)
     if not os.path.exists(text_prob_file):
-        text_outputs = generate_text_outputs(X_test, labels)
-        text_outputs.to_csv(text_prob_file)
+        text_prob_file_ori = os.path.join(OUTPUT_DIR_ORI, TEXT_PROB_OUTPUT)
+        if not os.path.exists(text_prob_file_ori):
+            text_outputs = generate_text_outputs(X_test, labels)
+            text_outputs.to_csv(text_prob_file)
+            text_outputs.to_csv(text_prob_file_ori)
+        else:
+            text_outputs = pd.read_csv(text_prob_file_ori, index_col=0, header=0)
+            text_outputs.to_csv(text_prob_file)
     else:
         text_outputs = pd.read_csv(text_prob_file, index_col=0, header=0)
 
     # image model prediction
     image_prob_file = os.path.join(OUTPUT_DIR, IMG_PROB_OUTPUT)
     if not os.path.exists(image_prob_file):
-        img_outputs = generate_image_outputs(X_test, labels)
-        img_outputs.to_csv(image_prob_file)
+        image_prob_file_ori = os.path.join(OUTPUT_DIR_ORI, IMG_PROB_OUTPUT)
+        if not os.path.exists(image_prob_file_ori):
+            img_outputs = generate_image_outputs(X_test, labels)
+            img_outputs.to_csv(image_prob_file)
+            img_outputs.to_csv(image_prob_file_ori)
+        else:
+            img_outputs = pd.read_csv(image_prob_file_ori, index_col=0, header=0)
+            img_outputs.to_csv(image_prob_file)
     else:
         img_outputs = pd.read_csv(image_prob_file, index_col=0, header=0)
 
