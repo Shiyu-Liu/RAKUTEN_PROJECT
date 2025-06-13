@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import seaborn as sns
 from PIL import Image
@@ -27,6 +28,8 @@ ori_dataset_backend['text'] = ori_dataset_backend['designation'] + " " + ori_dat
 img_class_dist = Image.open("figures/class_dist.jpg").convert("RGB")
 width, height = img_class_dist.size
 img_class_dist = img_class_dist.crop((0, 60, width, height))
+
+distilbert_results = pd.read_csv('data/distilbert_results.csv')
 
 if page == pages[0]:
     st.write("### Introduction of the project")
@@ -280,6 +283,80 @@ if page == pages[2]:
 if page == pages[3]:
     st.write("### Modeling")
     tab1, tab2 = st.tabs(["Textual Model", "Image Model"])
+
+    # Text Modeling
+    with tab1:
+        st.markdown("#### 🧠 Model Overview")
+        st.write("To design models for classifying products based on their textual description, we have applied:\n"
+            "- Classical machine learning (ML) models, such as **Support Vector Machines (SVM)**, **Random Forests (RF)** and **Extreme Gradient Boosting (XGBoost)**;\n"
+            "- Pretrained large language model (LLM) based on **DistilBERT**."
+        )
+
+        st.markdown("---")
+        st.markdown("#### ✏️ Classical ML Models")
+        st.write("For training the classical ML models, we first applied the TF-IDF vectorizer to the original text, and then used a " \
+            "grid search-based approach to find the best hyperparameters retained in the model.")
+        with st.expander("🛠️ Model Hyperparameter Details"):
+            st.write("**SVM**:")
+            st.code("SVC(C=1, loss='squared_hinge', kernel='linear')")
+            st.write("**RF**")
+            st.code("RandomForestClassifier(n_estimators=200, max_depth=None)")
+            st.write("**XGBoost**")
+            st.code("XGBClassifier(n_estimators=200, max_depth=None)")
+
+        st.dataframe({
+            "Model": ["SVM", "RF", "XGBoost"],
+            "Train Acc": [0.815, 0.954, 0.852],
+            "Train F1-score": [0.814, 0.953, 0.857],
+            "Val Acc": [ 0.719, 0.713, 0.713],
+            "Val F1-score": [0.720, 0.716, 0.721]
+        })
+        st.write("*Note that F1-score is computed using macro averaging method.*")
+        st.write("Based on the results, we retained **XGBoost** as the best model among these classical ML algorithms.")
+        with st.expander("🔍 Show Confusion Matrix"):
+            st.image("figures/text_basic_cm.png", caption="Confusion Matrix of the XGBoost Model", use_container_width=True)
+
+        st.markdown("---")
+        st.markdown("#### 💡 DistilBERT LLM")
+        st.write("DistilBERT is a virant of the original BERT large pretrained language model. We used the distilbert-based-uncase" \
+            " model and fine-tuned it on our dataset with 6 epochs. We did a **70%/15%/15%** stratified train-eval-test split on our original dataset.")
+        with st.expander("🛠️ Training Configuration"):
+            st.code("training_args = TrainingArguments(\n"
+                    "   learning_rate=2e-5,\n"
+                    "   per_device_train_batch_size=16,\n"
+                    "   per_device_eval_batch_size=64,\n"
+                    "   num_train_epochs=6,\n"
+                    "   weight_decay=0.01,\n"
+                    "   load_best_model_at_end=True,\n"
+                ")",
+                language="python"
+            )
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=distilbert_results['epoch'], y=distilbert_results['train_acc'], mode='lines+markers', name='Train Accuracy'))
+        fig.add_trace(go.Scatter(x=distilbert_results['epoch'], y=distilbert_results['train_f1'], mode='lines+markers', name='Train F1-score'))
+        fig.add_trace(go.Scatter(x=distilbert_results['epoch'], y=distilbert_results['eval_arr'], mode='lines+markers', name='Eval Accuracy'))
+        fig.add_trace(go.Scatter(x=distilbert_results['epoch'], y=distilbert_results['eval_f1'], mode='lines+markers', name='Eval F1-score'))
+        fig.update_layout(
+            title='Train and Evaluation Metrics',
+            xaxis_title='Epoch',
+            yaxis_title='Scores',
+            font=dict(size=14)
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.markdown("---")
+        st.markdown("#### 🏆 DistilBERT Model Performance")
+        st.write("After 6 epochs of training, our model has achieved a **weighted F1-score of 84.4%** with **overall accuracy of 84.5%** on the evaluation set.")
+        with st.expander("🔍 Show Confusion Matrix"):
+            st.image("figures/text_cm.png", caption="Confusion Matrix of the DistilBERT Model", use_container_width=True)
+
+        st.markdown("---")
+        st.markdown("#### ❌ Common Misclassifications")
+        st.write(
+            "Two frequent sources of confusion were:\n"
+            "- **Used book (Class 10)** v.s. **New book (Class 2705)**: difficult to distinguish from text descriptions.\n"
+            "- **Children's toy, costume (Class 1280)** v.s. **Social game (Class 1281)**: confusing terms."
+        )
 
     # Image Modeling
     with tab2: 
