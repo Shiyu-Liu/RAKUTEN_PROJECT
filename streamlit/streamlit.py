@@ -336,14 +336,15 @@ if page == pages[3]:
 
         col1, _ = st.columns([3,2])
         with col1:
-            st.dataframe({
+            df = pd.DataFrame({
                 "Model": ["SVM", "RF", "XGBoost"],
-                "Train Acc": [0.815, 0.954, 0.852],
-                "Train F1-score": [0.814, 0.953, 0.857],
-                "Val Acc": [ 0.719, 0.713, 0.713],
-                "Val F1-score": [0.720, 0.716, 0.721]
+                "Train Acc": ["81.5%", "95.4%", "85.2%"],
+                "Train F1-score": ["81.5%", "95.6%", "85.7%"],
+                "Val Acc": ["71.9%", "71.3%", "71.3%"],
+                "Val F1-score": ["71.8%", "71.4%", "71.9%"]
             })
-        st.write("*Note that F1-score is computed using macro averaging method.*")
+            st.dataframe(df, hide_index=True)
+        st.write("*Note that F1-score is computed using weighted averaging method.*")
         st.write("Based on the results, we retained **XGBoost** as the best model among these classical ML algorithms.")
         col1, _ = st.columns([3,2])
         with col1:
