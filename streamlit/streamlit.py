@@ -21,7 +21,7 @@ preprocessed_dataset = pd.read_csv('../data/text_data_clean.csv', delimiter=';',
 
 labels = pd.read_csv('data/class_category.csv', delimiter=';', index_col=None)
 labels.columns = ["Product Type Code", "Product Category"]
-labels.index = [''] * len(labels) # set the index to an empty string to hide row index
+labels['Product Type Code'] = labels['Product Type Code'].astype(str)
 
 ori_dataset_backend = original_dataset.copy()
 ori_dataset_backend['filename'] = "image_"+ori_dataset_backend['imageid'].astype(str)+"_product_"+ori_dataset_backend['productid'].astype(str)+".jpg"
@@ -72,7 +72,7 @@ if page == pages[1]:
     col1, _ = st.columns([3,2])
     with col1:
         with st.expander("Detailed Class Categories"):
-            st.table(labels)
+            st.dataframe(labels, hide_index=True)
     st.write("There are a priori some specific classes that are frequently confused even by human. Examples are the following:")
     st.markdown("""
         - Class 10 (used book) and class 2705 (new book)
