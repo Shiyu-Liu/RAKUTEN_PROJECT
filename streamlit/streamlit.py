@@ -5,6 +5,8 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import seaborn as sns
 from PIL import Image
+import os
+import random
 
 st.set_page_config(layout="wide")
 image_width = 800
@@ -284,6 +286,60 @@ if page == pages[2]:
         "- Resized to **224×224×3**.\n"
         "- Removed **4 blank images** and **408 low-content images** (threshold: 0.04)."
         )
+
+        st.markdown("#### 📌 Examples of Preprocessing Results")
+  
+        folder_zoom = "figures/image_zoom_examples"
+        
+        # Find all original image filenames
+        all_images = [f for f in os.listdir(folder_zoom) if f.startswith("original_image_") and f.endswith(".jpg")]
+
+        if "show_comparison" not in st.session_state:
+            st.session_state.show_comparison = False 
+
+        # Initialize session state
+        if "current_image" not in st.session_state:
+            st.session_state.current_image = random.choice(all_images)
+            st.session_state.show_comparison = False
+
+        # Center the button
+        col1, col2, col3 = st.columns([1, 1, 1])
+
+        with col2:
+            if not st.session_state.show_comparison:
+                button_text = "Show Before/After Comparison"
+            else:
+                button_text = "Get Another One"
+            
+            if st.button(button_text):
+                if not st.session_state.show_comparison:
+                    # First click - show comparison
+                    st.session_state.show_comparison = True
+                else:
+                    # Subsequent clicks - get new image different from current one
+                    available_images = [img for img in all_images if img != st.session_state.current_image]
+                    if available_images:
+                        st.session_state.current_image = random.choice(available_images)
+
+        # Display comparison if button has been clicked
+        if st.session_state.show_comparison:
+            preproc_img_name = st.session_state.current_image.replace("original_image_", "preprocessed_image_")
+            
+            st.markdown("---")
+            st.markdown(f"#### Before and After Comparison (Image ID: {st.session_state.current_image.split('_')[2]})")
+            
+            # Create two columns for side-by-side display
+            col_orig, col_preproc = st.columns(2)
+            
+            with col_orig:
+                st.image(os.path.join(folder_zoom, st.session_state.current_image), 
+                        caption="Original", 
+                        use_container_width=True)
+            
+            with col_preproc:
+                st.image(os.path.join(folder_zoom, preproc_img_name), 
+                        caption="Preprocessed", 
+                        use_container_width=True)
 
 
         st.markdown("---")
