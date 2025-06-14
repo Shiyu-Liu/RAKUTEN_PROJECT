@@ -622,6 +622,53 @@ if page == pages[3]:
             with st.expander("F1-Score Comparison Details"):
                 st.image("figures/f1_score_comparison.png", caption="Comparison of F1-scores for image, text and fused multi-modal model.", use_container_width=True)
 
+        st.markdown("---")
+        st.markdown("#### 📌 Examples of Successful Predictions")
+        st.write("We highlight the following examples to demonstrate that the fused model leverages both the individual text-based and image-based models to improve the final class prediction.")
+        col1, col2, col3, col4, _ = st.columns([1,2,1,2,1])
+        with col1:
+            with st.container():
+                st.image("../data/images/image_train_zoomed/{}".format(ori_dataset_backend.loc[477,'filename']))
+                with st.expander("Text Description"):
+                    st.markdown(f"{preprocessed_dataset.loc[477,'text']}")
+        with col2:
+            st.markdown("**Real Class**: 10 (used book)")
+            st.markdown("**Text Model Prediction**:<br>10 (used book), confidence: 0.98", unsafe_allow_html=True)
+            st.markdown("**Image Model Prediction**:<br>2705 (new book), confidence: 0.31", unsafe_allow_html=True)
+            st.markdown("**Final Prediction**: 10 (used book)", unsafe_allow_html=True)
+        with col3:
+            with st.container():
+                st.image("../data/images/image_train_zoomed/{}".format(ori_dataset_backend.loc[82160,'filename']))
+                with st.expander("Text Description"):
+                    st.markdown(f"{preprocessed_dataset.loc[82160,'text']}")
+        with col4:
+            st.markdown("**Real Class**: 2705 (new book)")
+            st.markdown("**Text Model Prediction**:<br>10 (used book), confidence: 0.59", unsafe_allow_html=True)
+            st.markdown("**Image Model Prediction**:<br>2705 (new book), confidence: 0.76", unsafe_allow_html=True)
+            st.markdown("**Final Prediction**: 2705 (new book)", unsafe_allow_html=True)
+
+        col1, col2, col3, col4, _ = st.columns([1,2,1,2,1])
+        with col1:
+            with st.container():
+                st.image("../data/images/image_train_zoomed/{}".format(ori_dataset_backend.loc[2573,'filename']))
+                with st.expander("Text Description"):
+                    st.markdown(f"{preprocessed_dataset.loc[2573,'text']}")
+        with col2:
+            st.markdown("**Real Class**: 40 (video game)")
+            st.markdown("**Text Model Prediction**:<br>40 (video game), confidence: 0.99", unsafe_allow_html=True)
+            st.markdown("**Image Model Prediction**:<br>40 (video game), confidence: 0.67", unsafe_allow_html=True)
+            st.markdown("**Final Prediction**: 40 (video game)", unsafe_allow_html=True)
+        with col3:
+            with st.container():
+                st.image("../data/images/image_train_zoomed/{}".format(ori_dataset_backend.loc[33509,'filename']))
+                with st.expander("Text Description"):
+                    st.markdown(f"{preprocessed_dataset.loc[33509,'text']}")
+        with col4:
+            st.markdown("**Real Class**: 2905 (PC game)")
+            st.markdown("**Text Model Prediction**:<br>2905 (PC game), confidence: 0.99", unsafe_allow_html=True)
+            st.markdown("**Image Model Prediction**:<br>40 (video game), confidence: 0.59", unsafe_allow_html=True)
+            st.markdown("**Final Prediction**: 2905 (PC game)", unsafe_allow_html=True)
+
 if page == pages[4]:
     st.markdown("#### ✅ Project Summary")
 
