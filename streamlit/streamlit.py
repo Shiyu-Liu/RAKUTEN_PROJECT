@@ -89,6 +89,13 @@ if page == pages[0]:
     )
     st.image(rakuten_logo, width=int(image_width*0.5))
 
+    st.markdown("---")
+    st.markdown("#### 📋 Task Allocation")
+    st.write("The tasks were split between two team members as follows:\n"
+        "- Shiyu: Textual data preprocessing and training of the textual model.\n"
+        "- Deniz: Image preprocessing and training of the image model.\n"
+    )
+
 if page == pages[1]:
     st.write("### Presentation of Data")
     st.markdown("#### 📸 Overview of Original Data")
