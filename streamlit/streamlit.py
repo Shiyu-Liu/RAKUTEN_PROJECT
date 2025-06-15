@@ -6,9 +6,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from PIL import Image
 import os
+os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
 import random
 import cv2
 import re, html
+import torch
+from keras.models import load_model
+from keras.applications.efficientnet import preprocess_input
+from keras.preprocessing.image import img_to_array
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 st.set_page_config(layout="wide")
 image_width = 800
@@ -735,10 +741,33 @@ def preprocess_text(user_text: str):
     text = re.sub(r'\s+', ' ', text).lstrip().rstrip()
     return text
 
+WEIGHTS = [0.5, 0.5]
+BEST_TEXT_MODEL = "../model/results/distilbert_best_model/saved_model"
+BEST_IMAGE_MODEL = "../model/results/efficientnetb0_b128l5_best_model.keras"
+
+text_model = AutoModelForSequenceClassification.from_pretrained(BEST_TEXT_MODEL, num_labels=27)
+text_model.eval()
+tokenizer = AutoTokenizer.from_pretrained(BEST_TEXT_MODEL)
+img_model = load_model(BEST_IMAGE_MODEL)
+
+def predict_text_outputs(text):
+    input = tokenizer([text], return_tensors="pt", padding=True, truncation=True, max_length=128)
+    text_output = text_model(**input)
+    preds = torch.nn.functional.softmax(text_output.logits)
+    preds = preds.detach().numpy()
+    return preds
+
+def predict_image_outputs(image):
+    x = img_to_array(image)
+    x = np.expand_dims(x, axis=0)
+    x = preprocess_input(x)
+    preds = img_model.predict(x)
+    return preds
+
 if page == pages[5]:
     st.write("### DEMO App: try out with your own input")
     st.markdown("#### 📘 How to Use the Demo App")
-    st.markdown("To test our model with your own input data, please upload an image of your product and enter a textual description below.")
+    st.markdown("To test our model with your own input data, please upload an image of your product and enter a textual description below. Then click the *Predict Class* button to generate a prediction from your input.")
     st.markdown("**Please note:**")
     st.markdown("- The textual model is trained on English-language data; using other languages may affect prediction quality.")
     st.markdown("- If either the image or the text input is missing, the model will generate a prediction using only the available modality.")
@@ -754,7 +783,7 @@ if page == pages[5]:
         user_text = st.text_area("Enter the text description of your product:")
 
     image_uploaded, text_uploaded = False, False
-    if st.button("Upload Data"):
+    if st.button("Predict Class"):
         if uploaded_file:
             user_image = Image.open(uploaded_file)
         with st.expander("Visualize Input Data"):
@@ -794,3 +823,48 @@ if page == pages[5]:
                         text_uploaded = True
                     else:
                         st.write("❌ No Text Available")
+
+        # make predictions
+        image_pred, image_probs = None, np.empty(0)
+        text_pred, text_probs = None, np.empty(0)
+        if image_uploaded:
+            image_probs = predict_image_outputs(user_image_cv2)
+        if text_uploaded:
+            text_probs = predict_text_outputs(user_text_clean)
+        final_pred = None
+        if image_uploaded and text_uploaded:
+            prob = (text_probs*WEIGHTS[0]+image_probs*WEIGHTS[1])/(WEIGHTS[0]+WEIGHTS[1])
+            final_pred = labels.iloc[np.argmax(prob)]
+            text_pred = labels.iloc[np.argmax(text_probs)]
+            image_pred = labels.iloc[np.argmax(image_probs)]
+        elif image_uploaded:
+            image_pred = labels.iloc[np.argmax(image_probs)]
+            final_pred = image_pred
+        elif text_uploaded:
+            text_pred = labels.iloc[np.argmax(text_probs)]
+            final_pred = text_pred
+
+        if image_uploaded or text_uploaded:
+            st.markdown("---")
+            st.markdown("#### 📈 **Model Prediction**")
+            col1, col2 = st.columns([3,3])
+            with col1:
+                st.write("🖼️ **Image Model Prediction**")
+                if image_uploaded:
+                    st.write("Class: **{}**".format(image_pred['Product Type Code']))
+                    st.write("Category: **{}**".format(image_pred['Product Category']))
+                    st.write("Confidence: **{:.2f}**".format(np.max(image_probs)))
+                else:
+                    st.write("❌ Not Available")
+            with col2:
+                st.write("📝 **Text Model Prediction**")
+                if text_uploaded:
+                    st.write("Class: **{}**".format(text_pred['Product Type Code']))
+                    st.write("Category: **{}**".format(text_pred['Product Category']))
+                    st.write("Confidence: **{:.2f}**".format(np.max(text_probs)))
+                else:
+                    st.write("❌ Not Available")
+
+            st.markdown("<br>🖼️➕📝 **Final Prediction**", unsafe_allow_html=True)
+            st.write("Class: **{}**".format(final_pred['Product Type Code']))
+            st.write("Category: **{}**".format(final_pred['Product Category']))
