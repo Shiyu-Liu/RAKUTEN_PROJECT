@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import matplotlib.pyplot as plt
-import seaborn as sns
 from PIL import Image
 import os
 os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
@@ -22,7 +20,7 @@ image_width = 800
 st.title("Rakuten: multi-modal product classification project")
 st.sidebar.image("figures/data_scientest.png")
 st.sidebar.title("Table of Contents")
-pages=["Introduction", "Data Exploration", "Data Preprocessing", "Modeling", "Conclusion", "DEMO app"]
+pages=["Introduction", "Data Exploration", "Data Preprocessing", "Modeling", "Conclusion", "DEMO App"]
 page=st.sidebar.radio("Go to", pages)
 st.sidebar.markdown("<div style='height:200px;'></div>", unsafe_allow_html=True) # Spacer to push footer down
 st.sidebar.markdown(
