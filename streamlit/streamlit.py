@@ -7,6 +7,8 @@ import seaborn as sns
 from PIL import Image
 import os
 import random
+import cv2
+import re, html
 
 st.set_page_config(layout="wide")
 image_width = 800
@@ -697,7 +699,41 @@ if page == pages[4]:
                 "- Allocate more time for experimenting with complex architectures and fine-tuning models.\n"
                 "- Design a coordinated validation pipeline from the start to ensure consistent evaluation."
             )
-    
+
+def preprocess_image(user_image: Image):
+    img = np.array(user_image.convert("RGBA"))
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, thresh = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY_INV)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not contours:
+        return None, False, "No content found in image"
+    x, y, w_box, h_box = cv2.boundingRect(np.concatenate(contours))
+    cropped = img[y:y+h_box, x:x+w_box]
+    border_size = 10
+    final_size = 224
+    target_size = final_size - (2*border_size)
+    scale = min(target_size / w_box, target_size / h_box)
+    new_w = int(w_box * scale)
+    new_h = int(h_box * scale)
+    resized = cv2.resize(cropped, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    pad_top = (target_size - new_h) // 2
+    pad_bottom = target_size - new_h - pad_top
+    pad_left = (target_size - new_w) // 2
+    pad_right = target_size - new_w - pad_left
+    padded = cv2.copyMakeBorder(resized, pad_top+border_size, pad_bottom+border_size, pad_left+border_size, pad_right+border_size,
+        borderType=cv2.BORDER_CONSTANT, value=[255, 255, 255])
+    return padded, True, ""
+
+def preprocess_text(user_text: str):
+    text = re.sub(r'<[^>]*>', '', user_text)
+    text = html.unescape(text)
+    text = re.sub(r'\b\d+(?:\.\d+)?\s?(?:[a-zA-Z%]{1,3}(?:[/.][a-zA-Z]{1,2})?)\b', ' ', text)
+    text = re.sub(r'\bA\d+\b|\bN°?\s\d+\b', '', text)
+    text = re.sub(r'[^a-zA-Z\s\'À-ÿäöüÄÖÜß]', ' ', text, flags=re.UNICODE)
+    text = re.sub(r'\s[Ø]\s', ' ', text, flags=re.UNICODE)
+    text = re.sub(r'\s[×xX]\s', ' ', text)
+    text = re.sub(r'\s+', ' ', text).lstrip().rstrip()
+    return text
 
 if page == pages[5]:
     st.write("### DEMO App: try out with your own input")
@@ -733,3 +769,24 @@ if page == pages[5]:
                 st.write(user_text)
             else:
                 st.write("❌ No Text Available")
+
+    if uploaded_file or user_text:
+        with st.expander("Visualize Preprocessed Data"):
+            col1, col2 = st.columns([3,3])
+            with col1:
+                if uploaded_file:
+                    user_imgage_cv2, success, err_msg = preprocess_image(user_image)
+                    if not success:
+                        st.write(f"⚠️ Error: {err_msg}")
+                    else:
+                        st.write("🖼️ Preprossed Image")
+                        st.image(user_imgage_cv2, caption="Preprocessed image")
+                else:
+                    st.write("❌ No Image Available")
+            with col2:
+                if user_text:
+                    user_text_clean = preprocess_text(user_text)
+                    st.write("📝 Preprossed Text")
+                    st.write(f"{user_text_clean}")
+                else:
+                    st.write("❌ No Text Available")
