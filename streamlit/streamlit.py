@@ -13,7 +13,7 @@ image_width = 800
 
 st.title("Rakuten: multi-modal product classification project")
 st.sidebar.image("figures/data_scientest.png")
-st.sidebar.title("Table of contents")
+st.sidebar.title("Table of Contents")
 pages=["Introduction", "Data Exploration", "Data Preprocessing", "Modeling", "Conclusion", "DEMO app"]
 page=st.sidebar.radio("Go to", pages)
 st.sidebar.markdown("<div style='height:200px;'></div>", unsafe_allow_html=True) # Spacer to push footer down
@@ -59,7 +59,7 @@ width, height = word_cloud_img.size
 word_cloud_img = word_cloud_img.crop((100, 30, width-100, height-60))
 
 if page == pages[0]:
-    st.write("### Introduction of the project")
+    st.write("### Introduction of the Project")
     st.markdown("#### 🛍️ Business Problem")
 
     st.write(
@@ -186,7 +186,7 @@ if page == pages[1]:
                 st.markdown(f"**Text:** {ori_dataset_backend.loc[33509,'text']}")
 
 if page == pages[2]:
-    st.write("### Preprocessing of data")
+    st.write("### Preprocessing of Data")
     tab1, tab2 = st.tabs(["Textual Data", "Image Data"])
 
     # Textual Data Preprocessing
