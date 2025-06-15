@@ -749,44 +749,48 @@ if page == pages[5]:
     with col1:
         st.markdown("##### 🖼️ Upload Image")
         uploaded_file = st.file_uploader("", type=["jpg", "png", "jpeg"])
-        if uploaded_file:
-            user_image = Image.open(uploaded_file)
     with col2:
         st.markdown("##### ✍️ Enter Text")
         user_text = st.text_area("Enter the text description of your product:")
 
-    with st.expander("Visualize Input Data"):
-        col1, col2 = st.columns([3,3])
-        with col1:
-            if uploaded_file:
-                st.write("✅ Image Uploaded:")
-                st.image(user_image, width=int(image_width*0.4))
-            else:
-                st.write("❌ No Image Available")
-        with col2:
-            if user_text:
-                st.write("✅ Text Entered:")
-                st.write(user_text)
-            else:
-                st.write("❌ No Text Available")
-
-    if uploaded_file or user_text:
-        with st.expander("Visualize Preprocessed Data"):
+    image_uploaded, text_uploaded = False, False
+    if st.button("Upload Data"):
+        if uploaded_file:
+            user_image = Image.open(uploaded_file)
+        with st.expander("Visualize Input Data"):
             col1, col2 = st.columns([3,3])
             with col1:
                 if uploaded_file:
-                    user_imgage_cv2, success, err_msg = preprocess_image(user_image)
-                    if not success:
-                        st.write(f"⚠️ Error: {err_msg}")
-                    else:
-                        st.write("🖼️ Preprossed Image")
-                        st.image(user_imgage_cv2, caption="Preprocessed image")
+                    st.write("✅ Image Uploaded:")
+                    st.image(user_image, width=int(image_width*0.4))
                 else:
                     st.write("❌ No Image Available")
             with col2:
                 if user_text:
-                    user_text_clean = preprocess_text(user_text)
-                    st.write("📝 Preprossed Text")
-                    st.write(f"{user_text_clean}")
+                    st.write("✅ Text Entered:")
+                    st.write(user_text)
                 else:
                     st.write("❌ No Text Available")
+
+        if uploaded_file or user_text:
+            with st.expander("Visualize Preprocessed Data"):
+                col1, col2 = st.columns([3,3])
+                with col1:
+                    if uploaded_file:
+                        user_image_cv2, success, err_msg = preprocess_image(user_image)
+                        if not success:
+                            st.write(f"⚠️ Error: {err_msg}")
+                        else:
+                            st.write("🖼️ Preprossed Image")
+                            st.image(user_image_cv2, caption="Preprocessed image")
+                            image_uploaded = True
+                    else:
+                        st.write("❌ No Image Available")
+                with col2:
+                    if user_text:
+                        user_text_clean = preprocess_text(user_text)
+                        st.write("📝 Preprossed Text")
+                        st.write(f"{user_text_clean}")
+                        text_uploaded = True
+                    else:
+                        st.write("❌ No Text Available")
