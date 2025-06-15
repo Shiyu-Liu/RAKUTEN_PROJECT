@@ -14,7 +14,7 @@ import xgboost as xgb
 import joblib
 
 MAX_VECTORIZATION_FEATURE = 3000
-SaveDirName="results/simple_textual_model"
+SaveDirName="../results/simple_textual_model"
 
 class SimpleModel(object):
     dataset = None
@@ -26,10 +26,8 @@ class SimpleModel(object):
         except:
             print("Please check the file provided")
             return
-        path = os.path.dirname(os.path.abspath(__file__))
-        self.save_path = os.path.join(path, SaveDirName)
-        if not os.path.exists(self.save_path):
-            os.makedirs(self.save_path)
+        if not os.path.exists(SaveDirName):
+            os.makedirs(SaveDirName)
         self.tokenize()
         self.encode()
 
@@ -90,11 +88,11 @@ class SimpleModel(object):
 
     def save_results(self, model, df_cm, df_report, modeltype, compressed=False):
         if compressed:
-            joblib.dump(model, os.path.join(self.save_path, modeltype+'_model.pkl'), compress=9)
+            joblib.dump(model, os.path.join(SaveDirName, modeltype+'_model.pkl'), compress=9)
         else:
-            joblib.dump(model, os.path.join(self.save_path, modeltype+'_model.pkl'))
-        df_cm.to_csv(os.path.join(self.save_path, modeltype+'_cm.csv'))
-        df_report.to_csv(os.path.join(self.save_path, modeltype+'_report.csv'))
+            joblib.dump(model, os.path.join(SaveDirName, modeltype+'_model.pkl'))
+        df_cm.to_csv(os.path.join(SaveDirName, modeltype+'_cm.csv'))
+        df_report.to_csv(os.path.join(SaveDirName, modeltype+'_report.csv'))
 
     def train_svm(self):
         # initialize linear SVM classifier
@@ -164,15 +162,15 @@ class SimpleModel(object):
     def load_evaluate_model(self, modeltype: str):
         print(f"Evaluating the pretrained {modeltype} model")
         try:
-            modelfile = os.path.join(self.save_path, modeltype+"_model.pkl")
+            modelfile = os.path.join(SaveDirName, modeltype+"_model.pkl")
             model = joblib.load(modelfile)
             print(model)
         except Exception as e:
-            print(f'Failed to load {modeltype} model in {self.save_path}, error message: {e}')
+            print(f'Failed to load {modeltype} model in {SaveDirName}, error message: {e}')
             return
         df_cm, df_report = self.evaluate(model, self.X_train, self.y_train)
-        df_cm.to_csv(os.path.join(self.save_path, modeltype+'_train_cm.csv'))
-        df_report.to_csv(os.path.join(self.save_path, modeltype+'_train_report.csv'))
+        df_cm.to_csv(os.path.join(SaveDirName, modeltype+'_train_cm.csv'))
+        df_report.to_csv(os.path.join(SaveDirName, modeltype+'_train_report.csv'))
 
     def visualize(self):
         # reduce the dimension of TF-IDF matrix for visualization

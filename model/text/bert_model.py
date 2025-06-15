@@ -11,7 +11,7 @@ from transformers import DataCollatorWithPadding
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, classification_report
 
-SaveDirName="results_distilbert"
+SaveDirName="../results_distilbert"
 MODEL_NAME = "distilbert-base-uncased"
 NUM_SAMPLES= 500
 DOWNSAMPLE = False
@@ -37,7 +37,7 @@ class BertModel(object):
             print("Please check the file provided")
             return
         path = os.path.dirname(os.path.abspath(__file__))
-        self.save_path = os.path.join(path, SaveDirName, datetime.today().strftime('%Y-%m-%d_%H-%M-%S'))
+        self.save_path = os.path.join(SaveDirName, datetime.today().strftime('%Y-%m-%d_%H-%M-%S'))
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
         num_labels = self.dataset['prdtypecode'].value_counts().shape[0]

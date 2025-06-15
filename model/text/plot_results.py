@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 fusion_model_dir = "fusion_model_2_2"
-text_results = "results/"+fusion_model_dir+"/classification_report_text_model.csv"
-image_results = "results/"+fusion_model_dir+"/classification_report_img_model.csv"
-fusion_results = "results/"+fusion_model_dir+"/classification_report.csv"
+text_results = "../results/"+fusion_model_dir+"/classification_report_text_model.csv"
+image_results = "../results/"+fusion_model_dir+"/classification_report_img_model.csv"
+fusion_results = "../results/"+fusion_model_dir+"/classification_report.csv"
 
 def plot_f1_score_comparison():
     df_text = pd.read_csv(text_results, index_col=0)
