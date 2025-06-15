@@ -58,7 +58,6 @@ width, height = word_cloud_img.size
 word_cloud_img = word_cloud_img.crop((100, 30, width-100, height-60))
 
 if page == pages[0]:
-    st.image(rakuten_logo, width=int(image_width*0.5))
     st.write("### Introduction of the project")
     st.markdown("#### 🛍️ Business Problem")
 
@@ -79,8 +78,9 @@ if page == pages[0]:
     )
 
     st.markdown(
-        "> The dataset was sourced from Rakuten Institute of Technology's Challenge Data platform and used for research purposes. https://challengedata.ens.fr/challenges/35"
+        "The dataset was sourced from Rakuten Institute of Technology's Challenge Data platform and used for research purposes. https://challengedata.ens.fr/challenges/35"
     )
+    st.image(rakuten_logo, width=int(image_width*0.5))
 
 if page == pages[1]:
     st.write("### Presentation of Data")
