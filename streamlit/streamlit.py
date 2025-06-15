@@ -700,4 +700,36 @@ if page == pages[4]:
     
 
 if page == pages[5]:
-    st.write("### DEMO app: try out with your own input")
+    st.write("### DEMO App: try out with your own input")
+    st.markdown("#### 📘 How to Use the Demo App")
+    st.markdown("To test our model with your own input data, please upload an image of your product and enter a textual description below.")
+    st.markdown("**Please note:**")
+    st.markdown("- The textual model is trained on English-language data; using other languages may affect prediction quality.")
+    st.markdown("- If either the image or the text input is missing, the model will generate a prediction using only the available modality.")
+
+    st.markdown("---")
+    st.markdown("#### 🚀 Try It Out")
+    col1, col2 = st.columns([3,3])
+    with col1:
+        st.markdown("##### 🖼️ Upload Image")
+        uploaded_file = st.file_uploader("", type=["jpg", "png", "jpeg"])
+        if uploaded_file:
+            user_image = Image.open(uploaded_file)
+    with col2:
+        st.markdown("##### ✍️ Enter Text")
+        user_text = st.text_area("Enter the text description of your product:")
+
+    with st.expander("Visualize Input Data"):
+        col1, col2 = st.columns([3,3])
+        with col1:
+            if uploaded_file:
+                st.write("✅ Image Uploaded:")
+                st.image(user_image, width=int(image_width*0.4))
+            else:
+                st.write("❌ No Image Available")
+        with col2:
+            if user_text:
+                st.write("✅ Text Entered:")
+                st.write(user_text)
+            else:
+                st.write("❌ No Text Available")
