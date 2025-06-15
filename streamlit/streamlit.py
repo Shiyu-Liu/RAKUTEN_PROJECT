@@ -24,6 +24,7 @@ st.sidebar.markdown(
     "<b>Shiyu LIU</b><br><br>"
     "Mentor:<br>"
     "<b>M. Yaniv BENICHOU</b><br><br>"
+    "<a href='https://github.com/Shiyu-Liu/RAKUTEN_PROJECT'>[Github]</a><br>"
     "June 2025"
     "</div>",
     unsafe_allow_html=True
