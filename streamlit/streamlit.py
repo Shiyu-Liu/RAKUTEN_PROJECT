@@ -744,6 +744,8 @@ def preprocess_text(user_text: str):
     text = re.sub(r'\s[Ø]\s', ' ', text, flags=re.UNICODE)
     text = re.sub(r'\s[×xX]\s', ' ', text)
     text = re.sub(r'\s+', ' ', text).lstrip().rstrip()
+    if len(re.findall(r"\b\w+(?:'\w+)?\b", text)) > 100:
+        text = ' '.join(re.findall(r"\b\w+(?:'\w+)?\b", text)[:100])
     return text
 
 WEIGHTS = [0.5, 0.5]
