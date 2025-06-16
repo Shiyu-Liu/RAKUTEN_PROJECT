@@ -100,7 +100,7 @@ if page == pages[1]:
     st.write("### Presentation of Data")
     st.markdown("#### 📸 Overview of Original Data")
     st.write("The original data included four columns as explanatory variables (i.e., 'designation', 'description', 'productid' and 'imageid') and one target column named 'prdtypecode'." \
-        "\nBoth 'designation' and 'description' are going to be merged as the textual data, while 'productid' and 'imageid' are used for extracting image file for the product."
+        "\nThe 'designation' and 'description' columns are merged into a single textual description of products, while 'productid' and 'imageid' are used to retrieve the associated image files."
     )
     st.dataframe(original_dataset.head())
 
@@ -111,7 +111,7 @@ if page == pages[1]:
     with col1:
         with st.expander("Detailed Class Categories"):
             st.dataframe(labels, hide_index=True)
-    st.write("There are a priori some specific classes that are frequently confused even by human. Examples are the following:")
+    st.write("There are, a priori, certain specific classes that are frequently confused even by humans. Examples are the following:")
     st.markdown("""
         - Class 10 (used book) and class 2705 (new book)
         - Class 1180 (board games), class 1280 (children's toys) and class 1281 (social games)
@@ -120,8 +120,8 @@ if page == pages[1]:
     )
     st.markdown("---")
     st.markdown("#### 📊 Class Distribution")
-    st.write("The target classes of the entire data samples are imbalanced, with the majority class 2583 (poolside items) containing over 10k samples, while the minority classes represent" \
-        " only about 1% of the entire data.")
+    st.write("The target classes in the dataset are imbalanced: the majority class, 2583 (poolside items), contains over 10,000 samples, while the minority classes each represent" \
+        " only about 1% of the total data.")
     st.image(img_class_dist, caption="Distribution of Data Samples across Target Classes", width=image_width)
 
     st.markdown("---")
@@ -227,7 +227,7 @@ if page == pages[2]:
         st.write("In terms of text filtering, we set up filtering criteria as follows:")
         st.markdown("""
             - Total word count of each sample's text within **100 words**;
-            - **Sample size of 2500** per class.
+            - Target **sample size of 2500** per class.
             """
         )
         col1, _ = st.columns([4,2])
@@ -580,9 +580,9 @@ if page == pages[3]:
 
     with tab3:
         st.markdown("#### 🪜 Fusion Strategy")
-        st.write("We used a **soft voting strategy** to combine the probabilities of predicted class from the text and image-based model to make final prediction using the multi-modal information.")
-        st.write("According to performance of each unimodal models, we chose the weights for averaging the predicted probabilities as follows."
-            " We also tested with the configuration that equally weights two models for fusion."
+        st.write("We used a **soft voting strategy** to combine the probabilities of predicted class from the text and image-based models to make a final prediction using multi-modal information.")
+        st.write("Based on the performance of each unimodal model, we assigned weights for averaging the predicted probabilities accordingly."
+            " We also experimented with a configuration that assigns equal weights to both models for fusion."
         )
         col1, _ = st.columns([4,2])
         with col1:
